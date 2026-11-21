@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient: Ultra-deep Midnight Sapphire with vivid inner cyan rim -->
+    <radialGradient id="bgGrad" cx="50%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#1E3A8A" />
+      <stop offset="45%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#020617" />
+    </radialGradient>
+
+    <!-- Top Glossy Facet (Vivid Electric Cyan) -->
+    <linearGradient id="facetTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0F9FF" />
+      <stop offset="20%" stop-color="#38BDF8" />
+      <stop offset="70%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#0369A1" />
+    </linearGradient>
+
+    <!-- Left Glass Facet (Translucent Electric Azure) -->
+    <linearGradient id="facetLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7" />
+      <stop offset="50%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+
+    <!-- Right Facet (Deep Royal Sapphire Depth) -->
+    <linearGradient id="facetRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1D4ED8" />
+      <stop offset="60%" stop-color="#1E40AF" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <!-- Floating Inner Crystal Core -->
+    <linearGradient id="coreTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="50%" stop-color="#BAE6FD" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+
+    <linearGradient id="coreLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.8" />
+    </linearGradient>
+
+    <linearGradient id="coreRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#1D4ED8" stop-opacity="0.75" />
+    </linearGradient>
+
+    <!-- Edge Rim Gradient -->
+    <linearGradient id="edgeGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#818CF8" />
+    </linearGradient>
+  </defs>
+
+  <!-- ================= 1. PREMIUM SQUIRCLE BASE ================= -->
+  <rect width="512" height="512" rx="116" fill="url(#bgGrad)" />
+  <rect x="8" y="8" width="496" height="496" rx="108" fill="none" stroke="url(#edgeGlow)" stroke-width="3" stroke-opacity="0.4" />
+
+  <!-- Ambient Backdrop Light -->
+  <circle cx="256" cy="256" r="180" fill="#0284C7" opacity="0.16" />
+
+  <!-- ================= 2. 3D ISOMETRIC CRYSTAL CUBE (Large & Razor-Sharp) ================= -->
+  <!-- Main Outer Cube (Center: 256, 256 | Radius: ~175) -->
+
+  <!-- 2A. LEFT FACET -->
+  <path d="M 106 170 L 256 256 L 256 426 L 106 340 Z" 
+        fill="url(#facetLeft)" 
+        stroke="#38BDF8" 
+        stroke-width="3.5" 
+        stroke-linejoin="round" />
+
+  <!-- 2B. RIGHT FACET -->
+  <path d="M 256 256 L 406 170 L 406 340 L 256 426 Z" 
+        fill="url(#facetRight)" 
+        stroke="#60A5FA" 
+        stroke-width="3.5" 
+        stroke-linejoin="round" />
+
+  <!-- 2C. TOP GLOSSY FACET -->
+  <path d="M 256 84 L 406 170 L 256 256 L 106 170 Z" 
+        fill="url(#facetTop)" 
+        stroke="#E0F2FE" 
+        stroke-width="4" 
+        stroke-linejoin="round" />
+
+  <!-- Top Glass Highlight Reflection (Sweeping Light Flare) -->
+  <path d="M 140 162 C 185 125 235 105 285 100 C 340 96 375 115 390 135 C 345 138 290 148 230 178 C 180 200 155 185 140 162 Z" 
+        fill="#FFFFFF" 
+        opacity="0.55" />
+
+  <!-- Subtle Bottom Ambient Shadow Ground -->
+  <ellipse cx="256" cy="446" rx="130" ry="24" fill="#000000" opacity="0.4" />
+
+  <!-- ================= 3. FLOATING INNER NEON CORE ================= -->
+  <!-- Inner Cube (Center: 256, 256 | Radius: ~74) -->
+  <g>
+    <!-- Inner Left Facet -->
+    <path d="M 192 219 L 256 256 L 256 329 L 192 292 Z" 
+          fill="url(#coreLeft)" 
+          stroke="#BAE6FD" 
+          stroke-width="2.5" 
+          stroke-linejoin="round" />
+    
+    <!-- Inner Right Facet -->
+    <path d="M 256 256 L 320 219 L 320 292 L 256 329 Z" 
+          fill="url(#coreRight)" 
+          stroke="#93C5FD" 
+          stroke-width="2.5" 
+          stroke-linejoin="round" />
+
+    <!-- Inner Top Facet -->
+    <path d="M 256 182 L 320 219 L 256 256 L 192 219 Z" 
+          fill="url(#coreTop)" 
+          stroke="#FFFFFF" 
+          stroke-width="3" 
+          stroke-linejoin="round" />
+  </g>
+
+  <!-- Central Flare Sparkle -->
+  <circle cx="256" cy="256" r="14" fill="#FFFFFF" opacity="0.9" />
+
+  <!-- ================= 4. RAZOR-SHARP 'YU' MONOGRAM ================= -->
+  <!-- High contrast, bold vector typography sculpted directly into the core -->
+  <!-- Letter 'Y' -->
+  <path d="M 206 226 L 224 252 L 224 282 C 224 285 226 287 229 287 L 233 287 C 236 287 238 285 238 282 L 238 252 L 256 226 C 258 223 256 219 252 219 L 244 219 C 241 219 239 221 237 224 L 231 234 L 225 224 C 223 221 221 219 218 219 L 210 219 C 206 219 204 223 206 226 Z" 
+        fill="#FFFFFF" 
+        stroke="#0F172A" 
+        stroke-width="2.5" 
+        stroke-linejoin="round" />
+
+  <!-- Letter 'U' -->
+  <path d="M 268 220 L 268 262 C 268 276 277 286 291 286 C 305 286 314 276 314 262 L 314 220 C 314 217 311 215 308 215 L 302 215 C 299 215 296 217 296 220 L 296 261 C 296 268 294 272 291 272 C 288 272 286 268 286 261 L 286 220 C 286 217 283 215 280 215 L 274 215 C 271 215 268 217 268 220 Z" 
+        fill="#FFFFFF" 
+        stroke="#0F172A" 
+        stroke-width="2.5" 
+        stroke-linejoin="round" />
+
+</svg>

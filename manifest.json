@@ -1,0 +1,24 @@
+{
+  "name": "YU Academy - 2026 Digital SAT & IELTS Exam Suite",
+  "short_name": "YU Academy",
+  "description": "2026 Digital SAT va IELTS rasmiy imtihon simulyatori. Creators: Ilkhomjonov Umarbek va Xurramov MuhammadYusuf",
+  "developer": {
+    "name": "Ilkhomjonov Umarbek va Xurramov MuhammadYusuf"
+  },
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
