@@ -27,11 +27,42 @@ export interface DictionaryEntry {
   pos?: string;
   uz?: string;
   shortDef?: string;
-  category?: string;
+  category?: 'sat' | 'ielts' | 'everyday' | 'math' | 'academic' | string;
+  level?: 'B1' | 'B2' | 'C1' | 'C2' | string;
+  ieltsBand?: '6.5' | '7.0' | '7.5' | '8.0' | '8.5' | '9.0' | string;
+  satDifficulty?: 'Medium' | 'Hard' | 'High-Frequency' | 'Advanced' | string;
+  topic?: 'education' | 'technology' | 'environment' | 'society' | 'science' | 'economy' | 'health' | 'culture' | 'math' | 'general' | string;
   example?: string;
   exampleUz?: string;
   synonyms?: string[];
+  antonyms?: string[];
+  examTip?: string;
+  collocations?: string[];
   [key: string]: any;
+}
+
+export interface DictionaryFilterParams {
+  search?: string;
+  category?: string;
+  level?: string;
+  ieltsBand?: string;
+  topic?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface CertificateVerificationResult {
+  valid: boolean;
+  certificateId: string;
+  candidateName: string;
+  examType: 'SAT' | 'IELTS';
+  scoreDisplay: string;
+  percentile: string;
+  issueDate: string;
+  leadExaminer: string;
+  academicDirector: string;
+  verificationHash: string;
+  qrCodeUrl?: string;
 }
 
 export interface ShadowingExercise {
