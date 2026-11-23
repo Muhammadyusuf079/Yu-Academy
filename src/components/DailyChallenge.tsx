@@ -2,14 +2,15 @@
 
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
-import { Flame, CheckCircle2, XCircle, ArrowRight, Sparkles, Award } from 'lucide-react';
+import { Flame, CheckCircle2, XCircle, ArrowRight, Sparkles, Award, Zap } from 'lucide-react';
 import { sound } from '@/lib/sound';
+import { useGamification } from '@/lib/xp-store';
 
 export default function DailyChallenge() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
-  const [streak, setStreak] = useState(3);
-  const [xp, setXp] = useState(150);
+
+  const { xp, streak, addXP } = useGamification();
 
   // Challenge of the day
   const challenge = {
@@ -35,8 +36,7 @@ export default function DailyChallenge() {
 
     if (idx === challenge.correctIndex) {
       sound.playSuccess();
-      setStreak((prev) => prev + 1);
-      setXp((prev) => prev + 50);
+      addXP(200, "Kunlik sinov to'g'ri yechildi!");
       try {
         confetti({
           particleCount: 80,
@@ -81,9 +81,9 @@ export default function DailyChallenge() {
                 <Flame className="w-4 h-4 fill-amber-400" />
                 <span>{streak} Kunlik Streak</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold">
-                <Award className="w-4 h-4" />
-                <span>+{xp} XP</span>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold">
+                <Zap className="w-4 h-4 text-cyan-400" />
+                <span>+200 XP Mukofot</span>
               </div>
             </div>
           </div>

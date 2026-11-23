@@ -11,6 +11,8 @@ import {
   ChevronDown,
   Sparkles,
   ArrowRight,
+  Brain,
+  Zap,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -27,6 +29,7 @@ export default function QuestionsPage() {
   const [examFilter, setExamFilter] = useState<'all' | 'SAT' | 'IELTS'>('all');
   const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState<number>(30);
 
   // Modals
   const [desmosOpen, setDesmosOpen] = useState(false);
@@ -48,7 +51,9 @@ export default function QuestionsPage() {
       const inQuestion = typeof item.question === 'string' ? item.question.toLowerCase().includes(q) : false;
       const inStimulus = item.stimulus?.toLowerCase().includes(q);
       const inSection = item.section ? item.section.toLowerCase().includes(q) : false;
-      const inTags = Array.isArray(item.tags) ? item.tags.some((t: string) => typeof t === 'string' && t.toLowerCase().includes(q)) : false;
+      const inTags = Array.isArray(item.tags)
+        ? item.tags.some((t: string) => typeof t === 'string' && t.toLowerCase().includes(q))
+        : false;
 
       return inQuestion || inStimulus || inSection || inTags;
     });
@@ -77,12 +82,12 @@ export default function QuestionsPage() {
             Digital SAT & IELTS Savollar Banki
           </h1>
           <p className="text-slate-400 text-sm mt-3">
-            College Board Bluebook va Cambridge imtihonlarining barcha mavzulari, yechimlari va Desmos qisqa yo&apos;llari bilan.
+            College Board Bluebook va Cambridge imtihonlarining barcha mavzulari, rasmiy yechimlari va Desmos tezkor usullari bilan.
           </p>
         </div>
 
         {/* Search & Filter Bar */}
-        <div className="p-4 sm:p-6 rounded-3xl bg-slate-900 border border-slate-800 mb-8 space-y-4">
+        <div className="p-4 sm:p-6 rounded-3xl bg-slate-900 border border-slate-800 mb-8 space-y-4 shadow-xl">
           <div className="relative">
             <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
             <input
@@ -96,19 +101,36 @@ export default function QuestionsPage() {
 
           <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
             {/* Exam Filter Buttons */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-slate-400 font-bold mr-1">Imtihon:</span>
               {(['all', 'SAT', 'IELTS'] as const).map((type) => (
                 <button
                   key={type}
-                  onClick={() => { sound.playClick(); setExamFilter(type); }}
+                  onClick={() => { sound.playClick(); setExamFilter(type); setVisibleCount(30); }}
                   className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
                     examFilter === type
-                      ? 'bg-cyan-500 text-slate-950'
+                      ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
                       : 'bg-slate-800 text-slate-300 hover:text-white'
                   }`}
                 >
                   {type === 'all' ? 'Barchasi' : type}
+                </button>
+              ))}
+
+              <span className="text-slate-500 mx-1">|</span>
+
+              <span className="text-slate-400 font-bold mr-1">Qiyinlik:</span>
+              {(['all', 'Easy', 'Medium', 'Hard', 'Advanced'] as const).map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => { sound.playClick(); setDifficultyFilter(diff); setVisibleCount(30); }}
+                  className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
+                    difficultyFilter === diff
+                      ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  {diff === 'all' ? 'Barcha Daraja' : diff}
                 </button>
               ))}
             </div>
@@ -127,13 +149,13 @@ export default function QuestionsPage() {
               <p>Qidiruvingiz bo&apos;yicha hech qanday savol topilmadi.</p>
             </div>
           ) : (
-            filtered.slice(0, 40).map((q, idx) => {
-              const isExpanded = expandedId === q.id;
+            filtered.slice(0, visibleCount).map((q, idx) => {
+              const isExpanded = expandedId === (q.id || String(idx));
 
               return (
                 <div
                   key={q.id || idx}
-                  className="rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all overflow-hidden"
+                  className="rounded-3xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all overflow-hidden shadow-lg"
                 >
                   <div className="p-5 sm:p-6">
                     {/* Tags & Metadata */}
@@ -152,7 +174,7 @@ export default function QuestionsPage() {
                     </div>
 
                     {/* Question Prompt */}
-                    <h3 className="text-base sm:text-lg font-bold text-white mb-4">
+                    <h3 className="text-base sm:text-lg font-bold text-white mb-4 leading-snug">
                       {q.question}
                     </h3>
 
@@ -176,9 +198,9 @@ export default function QuestionsPage() {
                       <button
                         onClick={() => {
                           sound.playClick();
-                          setExpandedId(isExpanded ? null : q.id);
+                          setExpandedId(isExpanded ? null : (q.id || String(idx)));
                         }}
-                        className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5"
+                        className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 transition-colors"
                       >
                         <span>{isExpanded ? 'Yechimni yashirish' : 'Yechim va Desmos usulini ko\'rish'}</span>
                         <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
@@ -196,12 +218,27 @@ export default function QuestionsPage() {
 
                     {/* Expandable Explanation */}
                     {isExpanded && (
-                      <div className="mt-4 p-4 rounded-xl bg-cyan-950/30 border border-cyan-800/40 text-xs sm:text-sm text-slate-200 leading-relaxed space-y-2 animate-in fade-in">
-                        <div className="font-bold text-cyan-300 flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                          <span>Qadamma-qadam ilmiy yechim:</span>
+                      <div className="mt-4 p-5 rounded-2xl bg-cyan-950/30 border border-cyan-800/40 text-xs sm:text-sm text-slate-200 leading-relaxed space-y-3 animate-in fade-in">
+                        
+                        <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono">
+                          <span className="text-cyan-400 font-bold block mb-1">To&apos;g&apos;ri javob:</span>
+                          <span className="text-white text-sm font-semibold">
+                            {typeof q.correctIndex === 'number' && q.options
+                              ? `${String.fromCharCode(65 + q.correctIndex)}) ${q.options[q.correctIndex]}`
+                              : q.correctAnswer}
+                          </span>
                         </div>
-                        <p className="whitespace-pre-line text-slate-300">{q.explanation}</p>
+
+                        <div>
+                          <div className="font-bold text-cyan-300 flex items-center gap-1.5 mb-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                            <span>Qadamma-qadam ilmiy yechim & tahlil:</span>
+                          </div>
+                          <p className="whitespace-pre-line text-slate-300 leading-relaxed">
+                            {q.explanation}
+                          </p>
+                        </div>
+
                       </div>
                     )}
                   </div>
@@ -210,6 +247,21 @@ export default function QuestionsPage() {
             })
           )}
         </div>
+
+        {/* Load More Button */}
+        {visibleCount < filtered.length && (
+          <div className="text-center mt-10">
+            <button
+              onClick={() => {
+                sound.playClick();
+                setVisibleCount((prev) => prev + 30);
+              }}
+              className="px-8 py-3.5 rounded-2xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-white font-bold text-sm transition-all shadow-lg hover:scale-105 active:scale-95"
+            >
+              Ko&apos;proq savollarni ko&apos;rish (+30 ta) • Qolgan: {filtered.length - visibleCount}
+            </button>
+          </div>
+        )}
 
       </main>
 

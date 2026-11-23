@@ -65,6 +65,7 @@ export default function HomePage() {
         onOpenDictionary={() => setDictOpen(true)}
         onOpenDesmos={() => setDesmosOpen(true)}
         onOpenFormula={() => setFormulaOpen(true)}
+        onOpenPricing={() => document.getElementById('yu-pricing-section')?.scrollIntoView({ behavior: 'smooth' })}
       />
 
       <main className="flex-1 flex flex-col items-center">
