@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Award, ShieldCheck, Printer, CheckCircle2, X, Download } from 'lucide-react';
+import { Award, ShieldCheck, Printer, CheckCircle2, X, Download, Palette, Sparkles } from 'lucide-react';
 import { sound } from '@/lib/sound';
 
 interface CertificateModalProps {
@@ -25,6 +25,7 @@ export default function CertificateModal({
   const [candidateName, setCandidateName] = useState(initialCandidateName);
   const [certCode, setCertCode] = useState('');
   const [issueDate, setIssueDate] = useState('');
+  const [certTheme, setCertTheme] = useState<'ivory' | 'royal_dark'>('ivory');
 
   useEffect(() => {
     // Generate unique verifiable certificate serial
@@ -48,42 +49,80 @@ export default function CertificateModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
-      <div className="relative w-full max-w-3xl bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-10 shadow-2xl my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
+      <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-700/80 rounded-3xl p-4 sm:p-8 shadow-2xl my-6">
         
-        {/* Close Button */}
-        <button
-          onClick={() => {
-            sound.playClick();
-            onClose();
-          }}
-          className="print:hidden absolute top-5 right-5 p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-all"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {/* Controls Bar */}
+        <div className="print:hidden flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-300">Diplom Ko&apos;rinishi:</span>
+            <div className="flex rounded-xl p-1 bg-slate-800 border border-slate-700">
+              <button
+                onClick={() => { sound.playClick(); setCertTheme('ivory'); }}
+                className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
+                  certTheme === 'ivory'
+                    ? 'bg-amber-100 text-amber-950 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                📜 Klassik Fil Suyagi (Tavsiya etiladi)
+              </button>
+              <button
+                onClick={() => { sound.playClick(); setCertTheme('royal_dark'); }}
+                className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
+                  certTheme === 'royal_dark'
+                    ? 'bg-slate-700 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                🌌 Royal Qora Oltin
+              </button>
+            </div>
+          </div>
+
+          <button
+            onClick={() => { sound.playClick(); onClose(); }}
+            className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-all"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
         {/* Certificate Frame (Optimized for Screen & Print) */}
-        <div className="relative bg-gradient-to-b from-amber-50/10 via-slate-950 to-amber-950/10 border-4 border-amber-500/40 rounded-2xl p-6 sm:p-10 text-center shadow-inner overflow-hidden">
-          
+        <div
+          className={`relative rounded-2xl p-6 sm:p-12 text-center shadow-2xl overflow-hidden transition-all duration-300 ${
+            certTheme === 'ivory'
+              ? 'bg-[#FFFDF7] text-slate-900 border-8 border-amber-600/70 shadow-amber-900/20'
+              : 'bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-white border-8 border-amber-500/60 shadow-black/60'
+          }`}
+        >
           {/* Subtle Decorative Corners */}
-          <div className="absolute top-2 left-2 w-8 h-8 border-t-2 border-l-2 border-amber-400/60" />
-          <div className="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-amber-400/60" />
-          <div className="absolute bottom-2 left-2 w-8 h-8 border-b-2 border-l-2 border-amber-400/60" />
-          <div className="absolute bottom-2 right-2 w-8 h-8 border-b-2 border-r-2 border-amber-400/60" />
+          <div className="absolute top-3 left-3 w-10 h-10 border-t-4 border-l-4 border-amber-500/70" />
+          <div className="absolute top-3 right-3 w-10 h-10 border-t-4 border-r-4 border-amber-500/70" />
+          <div className="absolute bottom-3 left-3 w-10 h-10 border-b-4 border-l-4 border-amber-500/70" />
+          <div className="absolute bottom-3 right-3 w-10 h-10 border-b-4 border-r-4 border-amber-500/70" />
 
           {/* Seal / Emblem */}
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 shadow-lg shadow-amber-500/30 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 text-slate-950 shadow-xl shadow-amber-500/30 mb-4 border-2 border-white/50">
             <Award className="w-9 h-9" />
           </div>
 
           {/* Certificate Header */}
-          <p className="text-xs uppercase tracking-[0.3em] font-extrabold text-amber-400 mb-1">
+          <p className="text-[11px] sm:text-xs uppercase tracking-[0.35em] font-black text-amber-700 dark:text-amber-400 mb-1">
             YU ACADEMY • OFFICIAL STANDARDIZED ASSESSMENT
           </p>
-          <h2 className="text-2xl sm:text-4xl font-serif font-black text-white tracking-wide mb-3">
+          <h2
+            className={`text-2xl sm:text-4xl font-serif font-black tracking-wide mb-3 ${
+              certTheme === 'ivory' ? 'text-slate-950' : 'text-white'
+            }`}
+          >
             Certificate of Achievement
           </h2>
-          <p className="text-xs text-slate-300 font-sans tracking-wider uppercase mb-6">
+          <p
+            className={`text-xs font-sans tracking-widest uppercase mb-6 ${
+              certTheme === 'ivory' ? 'text-slate-600' : 'text-slate-400'
+            }`}
+          >
             This official credential confirms that
           </p>
 
@@ -94,7 +133,11 @@ export default function CertificateModal({
               value={candidateName}
               onChange={(e) => setCandidateName(e.target.value)}
               placeholder="Ism va Familiyangizni kiriting"
-              className="w-full text-center text-xl sm:text-2xl font-serif font-bold text-amber-300 bg-transparent border-b-2 border-amber-400/60 focus:outline-none focus:border-amber-300 pb-1"
+              className={`w-full text-center text-xl sm:text-3xl font-serif font-black pb-1 bg-transparent border-b-2 focus:outline-none ${
+                certTheme === 'ivory'
+                  ? 'text-blue-950 border-amber-600/70 focus:border-amber-700'
+                  : 'text-amber-300 border-amber-400/60 focus:border-amber-300'
+              }`}
             />
           </div>
           <p className="print:hidden text-[11px] text-slate-400 mb-6 italic">
@@ -102,46 +145,82 @@ export default function CertificateModal({
           </p>
 
           {/* Achievement Description */}
-          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed mb-6 font-sans">
+          <p
+            className={`text-xs sm:text-sm max-w-xl mx-auto leading-relaxed mb-6 font-sans ${
+              certTheme === 'ivory' ? 'text-slate-700' : 'text-slate-300'
+            }`}
+          >
             has successfully completed the full-length standardized examination for <br />
-            <strong className="text-white font-bold">{examTitle}</strong> under strict 
-            College Board & Cambridge assessment criteria, exhibiting high academic proficiency and analytical acumen.
+            <strong className={certTheme === 'ivory' ? 'text-slate-950 font-bold' : 'text-white font-bold'}>
+              {examTitle}
+            </strong>{' '}
+            under strict College Board &amp; Cambridge assessment criteria, exhibiting high academic proficiency and analytical acumen.
           </p>
 
           {/* Official Score Display */}
-          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto p-4 rounded-xl bg-slate-900/90 border border-amber-500/30 mb-8">
+          <div
+            className={`grid grid-cols-2 gap-4 max-w-md mx-auto p-4 rounded-2xl mb-8 border ${
+              certTheme === 'ivory'
+                ? 'bg-amber-50/70 border-amber-300 text-slate-900 shadow-sm'
+                : 'bg-slate-900/90 border-amber-500/30 text-white'
+            }`}
+          >
             <div className="text-center">
-              <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider block">
+              <span className="text-[10px] uppercase font-bold text-amber-700 dark:text-amber-400 tracking-wider block">
                 Official Score
               </span>
-              <span className="text-2xl sm:text-3xl font-black text-white font-mono">
+              <span
+                className={`text-2xl sm:text-3xl font-black font-mono ${
+                  certTheme === 'ivory' ? 'text-slate-950' : 'text-white'
+                }`}
+              >
                 {scoreDisplay}
               </span>
             </div>
-            <div className="text-center border-l border-slate-700">
-              <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider block">
+            <div
+              className={`text-center border-l ${
+                certTheme === 'ivory' ? 'border-amber-200' : 'border-slate-700'
+              }`}
+            >
+              <span className="text-[10px] uppercase font-bold text-amber-700 dark:text-amber-400 tracking-wider block">
                 Percentile Status
               </span>
-              <span className="text-xl sm:text-2xl font-black text-emerald-400 font-mono">
+              <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
                 {percentile}
               </span>
             </div>
           </div>
 
           {/* Signatures & Verification Grid */}
-          <div className="grid grid-cols-3 items-end gap-4 max-w-xl mx-auto pt-4 border-t border-slate-800">
+          <div
+            className={`grid grid-cols-3 items-end gap-4 max-w-xl mx-auto pt-4 border-t ${
+              certTheme === 'ivory' ? 'border-amber-200' : 'border-slate-800'
+            }`}
+          >
             
             {/* Signature 1: Academic Director */}
             <div className="flex flex-col items-center">
-              <div className="h-14 flex items-end justify-center mb-1">
+              <div className="h-16 flex items-end justify-center mb-1">
                 <img
                   src="/assets/images/signatures/signature_academic_director.png"
-                  alt="Signature"
-                  className="max-h-14 max-w-[130px] object-contain -rotate-2"
+                  alt="Academic Director Signature"
+                  className={`max-h-16 max-w-[130px] object-contain -rotate-2 ${
+                    certTheme === 'royal_dark'
+                      ? 'filter invert brightness-200 contrast-125'
+                      : 'contrast-125'
+                  }`}
                 />
               </div>
-              <div className="w-full border-t border-slate-600 pt-1 text-center">
-                <span className="text-[11px] font-semibold text-slate-300 block">
+              <div
+                className={`w-full border-t pt-1 text-center ${
+                  certTheme === 'ivory' ? 'border-slate-400' : 'border-slate-600'
+                }`}
+              >
+                <span
+                  className={`text-[11px] font-bold block ${
+                    certTheme === 'ivory' ? 'text-slate-900' : 'text-slate-200'
+                  }`}
+                >
                   Head of Academic Board
                 </span>
               </div>
@@ -149,29 +228,51 @@ export default function CertificateModal({
 
             {/* Central Verification QR/Badge */}
             <div className="flex flex-col items-center justify-center">
-              <div className="w-12 h-12 rounded-xl bg-slate-900 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-md shadow-emerald-500/10 mb-1">
+              <div
+                className={`w-12 h-12 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-md mb-1 border ${
+                  certTheme === 'ivory'
+                    ? 'bg-emerald-50 border-emerald-300'
+                    : 'bg-slate-900 border-emerald-500/40'
+                }`}
+              >
                 <ShieldCheck className="w-7 h-7" />
               </div>
-              <span className="text-[10px] font-mono font-bold text-slate-300 block">
+              <span
+                className={`text-[10px] font-mono font-bold block ${
+                  certTheme === 'ivory' ? 'text-slate-800' : 'text-slate-300'
+                }`}
+              >
                 {certCode}
               </span>
-              <span className="text-[9px] font-bold text-emerald-400 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 VERIFIED 2026
               </span>
             </div>
 
             {/* Signature 2: Chief Assessment Officer */}
             <div className="flex flex-col items-center">
-              <div className="h-14 flex items-end justify-center mb-1">
+              <div className="h-16 flex items-end justify-center mb-1">
                 <img
                   src="/assets/images/signatures/signature_lead_examiner.png"
-                  alt="Signature"
-                  className="max-h-14 max-w-[130px] object-contain rotate-1"
+                  alt="Lead Examiner Signature"
+                  className={`max-h-16 max-w-[130px] object-contain rotate-1 ${
+                    certTheme === 'royal_dark'
+                      ? 'filter invert brightness-200 contrast-125'
+                      : 'contrast-125'
+                  }`}
                 />
               </div>
-              <div className="w-full border-t border-slate-600 pt-1 text-center">
-                <span className="text-[11px] font-semibold text-slate-300 block">
+              <div
+                className={`w-full border-t pt-1 text-center ${
+                  certTheme === 'ivory' ? 'border-slate-400' : 'border-slate-600'
+                }`}
+              >
+                <span
+                  className={`text-[11px] font-bold block ${
+                    certTheme === 'ivory' ? 'text-slate-900' : 'text-slate-200'
+                  }`}
+                >
                   Chief Assessment Officer
                 </span>
               </div>
@@ -180,9 +281,19 @@ export default function CertificateModal({
           </div>
 
           {/* Footer Meta */}
-          <div className="mt-6 text-[11px] text-slate-400">
-            Issue Date: <strong className="text-slate-200">{issueDate}</strong> • Verification Registry:{' '}
-            <span className="text-cyan-400 font-mono font-medium">yuacademy.uz/verify/{certCode}</span>
+          <div
+            className={`mt-6 text-[11px] ${
+              certTheme === 'ivory' ? 'text-slate-500' : 'text-slate-400'
+            }`}
+          >
+            Issue Date:{' '}
+            <strong className={certTheme === 'ivory' ? 'text-slate-800' : 'text-slate-200'}>
+              {issueDate}
+            </strong>{' '}
+            • Verification Registry:{' '}
+            <span className="text-cyan-600 dark:text-cyan-400 font-mono font-medium">
+              yuacademy.uz/verify/{certCode}
+            </span>
           </div>
 
         </div>

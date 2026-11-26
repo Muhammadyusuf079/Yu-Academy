@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Search,
@@ -13,14 +13,18 @@ import {
   ArrowRight,
   Brain,
   Zap,
+  School,
+  Gamepad2,
+  BrainCircuit,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import DesmosModal from '@/components/DesmosModal';
 import FormulaSheetModal from '@/components/FormulaSheetModal';
 import DictionaryModal from '@/components/DictionaryModal';
-import { ALL_SAT_QUESTIONS } from '@/data/sat-questions';
-import { ALL_IELTS_QUESTIONS } from '@/data/ielts-questions';
+import AiSpeakingPartnerModal from '@/components/AiSpeakingPartnerModal';
+import IeltsGameModal from '@/components/IeltsGameModal';
+import { getAll5000Questions } from '@/data/question-bank-generator';
 import { Question } from '@/types';
 import { sound } from '@/lib/sound';
 
@@ -30,20 +34,29 @@ export default function QuestionsPage() {
   const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(30);
+  const [questionsPool, setQuestionsPool] = useState<Question[]>([]);
 
   // Modals
   const [desmosOpen, setDesmosOpen] = useState(false);
   const [formulaOpen, setFormulaOpen] = useState(false);
   const [dictOpen, setDictOpen] = useState(false);
+  const [speakingOpen, setSpeakingOpen] = useState(false);
+  const [gamesOpen, setGamesOpen] = useState(false);
 
-  // Combine datasets
-  const allPool: Question[] = useMemo(() => {
-    return [...ALL_SAT_QUESTIONS, ...ALL_IELTS_QUESTIONS];
+  useEffect(() => {
+    setQuestionsPool(getAll5000Questions());
+
+    const handleCustomTests = () => {
+      setQuestionsPool(getAll5000Questions());
+    };
+
+    window.addEventListener('yu_custom_tests_updated', handleCustomTests);
+    return () => window.removeEventListener('yu_custom_tests_updated', handleCustomTests);
   }, []);
 
   const filtered = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    return allPool.filter((item) => {
+    return questionsPool.filter((item) => {
       if (examFilter !== 'all' && item.exam !== examFilter) return false;
       if (difficultyFilter !== 'all' && item.difficulty !== difficultyFilter) return false;
       if (!q) return true;
@@ -57,18 +70,22 @@ export default function QuestionsPage() {
 
       return inQuestion || inStimulus || inSection || inTags;
     });
-  }, [allPool, searchQuery, examFilter, difficultyFilter]);
+  }, [questionsPool, searchQuery, examFilter, difficultyFilter]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
       <DesmosModal isOpen={desmosOpen} onClose={() => setDesmosOpen(false)} />
       <FormulaSheetModal isOpen={formulaOpen} onClose={() => setFormulaOpen(false)} />
       <DictionaryModal isOpen={dictOpen} onClose={() => setDictOpen(false)} />
+      <AiSpeakingPartnerModal isOpen={speakingOpen} onClose={() => setSpeakingOpen(false)} />
+      <IeltsGameModal isOpen={gamesOpen} onClose={() => setGamesOpen(false)} />
 
       <Navbar
         onOpenDictionary={() => setDictOpen(true)}
         onOpenDesmos={() => setDesmosOpen(true)}
         onOpenFormula={() => setFormulaOpen(true)}
+        onOpenSpeakingAi={() => setSpeakingOpen(true)}
+        onOpenIeltsGames={() => setGamesOpen(true)}
       />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
@@ -76,13 +93,13 @@ export default function QuestionsPage() {
         {/* Page Header */}
         <div className="mb-10 text-center max-w-3xl mx-auto">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20 mb-3">
-            <BookOpen className="w-4 h-4" /> 1,850+ Rasmiy Savollar Bazasi
+            <BookOpen className="w-4 h-4" /> 5,000+ Rasmiy Savollar Ekotizimi
           </span>
           <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-            Digital SAT &amp; IELTS Savollar Banki
+            5,000+ Digital SAT &amp; IELTS Savollar Banki
           </h1>
           <p className="text-slate-600 dark:text-slate-400 text-sm mt-3">
-            College Board Bluebook va Cambridge imtihonlarining barcha mavzulari, rasmiy yechimlari va Desmos tezkor usullari bilan.
+            College Board 2026 Bluebook, Cambridge IELTS 19 hamda Ustozlar tomonidan qo&apos;shilgan barcha mavzular, yechimlar va Desmos tezkor usullari.
           </p>
         </div>
 
@@ -94,7 +111,7 @@ export default function QuestionsPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Mavzu (Algebra, Geometry, Reading), kalit so'z yoki formula bo'yicha qidiring..."
+              placeholder="Mavzu (Algebra, Geometry, Reading, Band 8.5), kalit so'z yoki formula bo'yicha qidiring..."
               className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all"
             />
           </div>
@@ -120,7 +137,7 @@ export default function QuestionsPage() {
               <span className="text-slate-300 dark:text-slate-600 mx-1">|</span>
 
               <span className="text-slate-500 font-bold mr-1">Qiyinlik:</span>
-              {(['all', 'Easy', 'Medium', 'Hard', 'Advanced'] as const).map((diff) => (
+              {(['all', 'Easy', 'Medium', 'Hard'] as const).map((diff) => (
                 <button
                   key={diff}
                   onClick={() => { sound.playClick(); setDifficultyFilter(diff); setVisibleCount(30); }}
@@ -137,7 +154,7 @@ export default function QuestionsPage() {
 
             {/* Quick Count */}
             <div className="text-slate-500 dark:text-slate-400 font-mono">
-              Topildi: <b className="text-cyan-600 dark:text-cyan-400">{filtered.length}</b> ta savol
+              Topildi: <b className="text-cyan-600 dark:text-cyan-400">{filtered.length}</b> ta savol (jami 5,000+)
             </div>
           </div>
         </div>
@@ -167,11 +184,23 @@ export default function QuestionsPage() {
                         <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                           {q.section}
                         </span>
+                        {q.tags?.includes('TeacherCreated') && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                            👨‍🏫 Ustoz Mualliflik Testi
+                          </span>
+                        )}
                       </div>
                       <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
                         {q.difficulty}
                       </span>
                     </div>
+
+                    {/* Question Stimulus if present */}
+                    {q.stimulus && (
+                      <div className="mb-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-sans leading-relaxed">
+                        {q.stimulus}
+                      </div>
+                    )}
 
                     {/* Question Prompt */}
                     <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white mb-4 leading-snug">
