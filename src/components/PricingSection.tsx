@@ -176,7 +176,7 @@ export default function PricingSection() {
   ];
 
   return (
-    <section id="yu-pricing-section" className="w-full py-20 bg-slate-950 relative overflow-hidden">
+    <section id="yu-pricing-section" className="w-full py-20 bg-slate-50 dark:bg-slate-950 relative overflow-hidden transition-colors">
       
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-tr from-cyan-500/10 via-purple-500/5 to-blue-600/10 blur-[140px] rounded-full pointer-events-none -z-10" />
@@ -185,14 +185,14 @@ export default function PricingSection() {
         
         {/* Section Title */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-500/20 text-cyan-700 dark:text-cyan-400 text-xs font-bold uppercase tracking-wider mb-3">
             <Zap className="w-4 h-4" /> Shaffof & Professional Tariflar (2026 Standart)
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
             Maqsadli Natijangizga Mos Tarifni Tanlang
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base mt-3">
-            Pul to&apos;lash orqali yoki platformada vazifalarni bajarib <span className="text-cyan-400 font-bold">XP energiya</span> to&apos;plab obuna bo&apos;ling!
+          <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base mt-3">
+            Pul to&apos;lash orqali yoki platformada vazifalarni bajarib <span className="text-cyan-600 dark:text-cyan-400 font-bold">XP energiya</span> to&apos;plab obuna bo&apos;ling!
           </p>
         </div>
 
@@ -200,13 +200,13 @@ export default function PricingSection() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
           
           {/* Role Switcher */}
-          <div className="p-1 rounded-2xl bg-slate-900 border border-slate-800 flex items-center">
+          <div className="p-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center">
             <button
               onClick={() => { sound.playClick(); setRole('student'); }}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
                 role === 'student'
                   ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Award className="w-4 h-4" />
@@ -217,7 +217,7 @@ export default function PricingSection() {
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
                 role === 'teacher'
                   ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Users className="w-4 h-4" />
@@ -226,13 +226,13 @@ export default function PricingSection() {
           </div>
 
           {/* Period Switcher */}
-          <div className="p-1 rounded-2xl bg-slate-900 border border-slate-800 flex items-center">
+          <div className="p-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center">
             <button
               onClick={() => { sound.playClick(); setPeriod('monthly'); }}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                 period === 'monthly'
-                  ? 'bg-slate-800 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-slate-800 text-white dark:bg-slate-800 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Oylik to&apos;lov
@@ -241,8 +241,8 @@ export default function PricingSection() {
               onClick={() => { sound.playClick(); setPeriod('yearly'); }}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                 period === 'yearly'
-                  ? 'bg-slate-800 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-slate-800 text-white dark:bg-slate-800 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Yillik to&apos;lov (O&apos;z narxida)
@@ -262,10 +262,10 @@ export default function PricingSection() {
                 key={plan.id}
                 className={`relative rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 ${
                   plan.featured
-                    ? 'bg-gradient-to-b from-slate-900 via-slate-900 to-cyan-950/40 border-2 border-cyan-400 shadow-2xl shadow-cyan-500/20 scale-[1.02]'
+                    ? 'bg-gradient-to-b from-white via-cyan-50/50 to-cyan-100/30 dark:from-slate-900 dark:via-slate-900 dark:to-cyan-950/40 border-2 border-cyan-500 dark:border-cyan-400 shadow-2xl shadow-cyan-500/20 scale-[1.02]'
                     : plan.isVip
-                    ? 'bg-gradient-to-b from-slate-900 via-slate-900 to-purple-950/40 border-2 border-purple-500/80 shadow-2xl shadow-purple-500/20'
-                    : 'bg-slate-900/80 border border-slate-800 hover:border-slate-700'
+                    ? 'bg-gradient-to-b from-white via-purple-50/50 to-purple-100/30 dark:from-slate-900 dark:via-slate-900 dark:to-purple-950/40 border-2 border-purple-500 shadow-2xl shadow-purple-500/20'
+                    : 'bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-md shadow-slate-200/40 dark:shadow-none'
                 }`}
               >
                 {/* Popular / VIP Badge */}
@@ -283,31 +283,31 @@ export default function PricingSection() {
                 <div>
                   {/* Badge & Title */}
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-bold text-slate-400">{plan.badge}</span>
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">{plan.badge}</span>
                     {isCurrent && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                         Joriy Tarif
                       </span>
                     )}
                   </div>
 
-                  <h3 className="text-2xl font-black text-white mb-2">{plan.name}</h3>
-                  <p className="text-xs text-slate-400 mb-6 min-h-[34px] leading-relaxed">
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{plan.name}</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mb-6 min-h-[34px] leading-relaxed">
                     {plan.tagline}
                   </p>
 
                   {/* Price Box with EXACT Baseline Alignment */}
-                  <div className="mb-6 p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80">
+                  <div className="mb-6 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800/80">
                     <div className="flex items-baseline justify-start gap-1">
-                      <span className="text-4xl font-black text-white font-mono tracking-tight">
+                      <span className="text-4xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
                         ${plan.priceUSD}
                       </span>
-                      <span className="text-sm font-semibold text-slate-400 font-sans">
+                      <span className="text-sm font-semibold text-slate-500 dark:text-slate-400 font-sans">
                         {plan.periodLabel}
                       </span>
                     </div>
 
-                    <div className="mt-2 text-xs font-semibold text-cyan-400">
+                    <div className="mt-2 text-xs font-bold text-cyan-600 dark:text-cyan-400">
                       {plan.priceUZS}
                     </div>
                     <div className="text-[11px] text-slate-500 mt-0.5">
@@ -315,7 +315,7 @@ export default function PricingSection() {
                     </div>
                   </div>
 
-                  <div className="w-full h-px bg-slate-800/80 mb-6" />
+                  <div className="w-full h-px bg-slate-200 dark:bg-slate-800/80 mb-6" />
 
                   {/* Feature List */}
                   <ul className="space-y-3 mb-8">

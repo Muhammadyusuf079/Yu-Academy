@@ -54,7 +54,7 @@ export default function DailyChallenge() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         
         {/* Main Card */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 shadow-2xl p-6 sm:p-8">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-white via-slate-50 to-cyan-50/20 dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-2xl p-6 sm:p-8 transition-colors">
           
           {/* Ambient Glow */}
           <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -62,14 +62,14 @@ export default function DailyChallenge() {
           {/* Header Badge & Streak */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-2.5">
-              <span className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+              <span className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400">
                 <Sparkles className="w-5 h-5" />
               </span>
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">
+                <span className="text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
                   Kunlik Sinov (Daily Challenge)
                 </span>
-                <h3 className="text-lg sm:text-xl font-extrabold text-white">
+                <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
                   {challenge.exam}
                 </h3>
               </div>
@@ -77,33 +77,33 @@ export default function DailyChallenge() {
 
             {/* Streak & XP Stats */}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
-                <Flame className="w-4 h-4 fill-amber-400" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold">
+                <Flame className="w-4 h-4 fill-amber-500 text-amber-600 dark:fill-amber-400 dark:text-amber-500" />
                 <span>{streak} Kunlik Streak</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold">
-                <Zap className="w-4 h-4 text-cyan-400" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-xs font-bold">
+                <Zap className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                 <span>+200 XP Mukofot</span>
               </div>
             </div>
           </div>
 
           {/* Question Text */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-slate-800/50 border border-slate-700/60 mb-6 text-slate-100 text-sm sm:text-base leading-relaxed font-medium">
+          <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 mb-6 text-slate-900 dark:text-slate-100 text-sm sm:text-base leading-relaxed font-semibold">
             {challenge.question}
           </div>
 
           {/* Options */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
             {challenge.options.map((opt, idx) => {
-              let btnClass = 'bg-slate-800/70 border-slate-700/80 text-slate-200 hover:bg-slate-800 hover:border-slate-600';
+              let btnClass = 'bg-slate-50 dark:bg-slate-800/70 border-slate-200 dark:border-slate-700/80 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800';
               if (isAnswered) {
                 if (idx === challenge.correctIndex) {
-                  btnClass = 'bg-emerald-500/20 border-emerald-500 text-emerald-300 font-bold';
+                  btnClass = 'bg-emerald-500/20 border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold';
                 } else if (idx === selectedOption) {
-                  btnClass = 'bg-rose-500/20 border-rose-500 text-rose-300 font-bold';
+                  btnClass = 'bg-rose-500/20 border-rose-500 text-rose-700 dark:text-rose-300 font-bold';
                 } else {
-                  btnClass = 'bg-slate-800/40 border-slate-800 text-slate-500 opacity-60';
+                  btnClass = 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 opacity-60';
                 }
               }
 
