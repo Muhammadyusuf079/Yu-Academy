@@ -24,6 +24,7 @@ import {
   Gamepad2,
   BrainCircuit,
   ChevronDown,
+  ShieldAlert,
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { useGamification } from '@/lib/xp-store';
@@ -34,6 +35,7 @@ import AuthModal from '@/components/AuthModal';
 import TeacherStudioModal from '@/components/TeacherStudioModal';
 import AiSpeakingPartnerModal from '@/components/AiSpeakingPartnerModal';
 import IeltsGameModal from '@/components/IeltsGameModal';
+import AdminModal from '@/components/AdminModal';
 import YuLogo from '@/components/YuLogo';
 
 interface NavbarProps {
@@ -43,6 +45,7 @@ interface NavbarProps {
   onOpenPricing?: () => void;
   onOpenSpeakingAi?: () => void;
   onOpenIeltsGames?: () => void;
+  onOpenAdmin?: () => void;
 }
 
 export default function Navbar({
@@ -52,6 +55,7 @@ export default function Navbar({
   onOpenPricing,
   onOpenSpeakingAi,
   onOpenIeltsGames,
+  onOpenAdmin,
 }: NavbarProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -60,13 +64,14 @@ export default function Navbar({
   const [teacherStudioOpen, setTeacherStudioOpen] = useState(false);
   const [speakingAiOpen, setSpeakingAiOpen] = useState(false);
   const [ieltsGamesOpen, setIeltsGamesOpen] = useState(false);
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
 
   const toolsDropdownRef = useRef<HTMLDivElement | null>(null);
 
   const { xp, streak } = useGamification();
   const { theme, toggleTheme } = useTheme();
-  const { user, isTeacher, isStudent } = useAuth();
+  const { user, isTeacher } = useAuth();
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -138,6 +143,16 @@ export default function Navbar({
     }
   };
 
+  const handleOpenAdminModal = () => {
+    sound.playClick();
+    setToolsDropdownOpen(false);
+    if (onOpenAdmin) {
+      onOpenAdmin();
+    } else {
+      setAdminModalOpen(true);
+    }
+  };
+
   return (
     <>
       {/* Modals */}
@@ -165,6 +180,11 @@ export default function Navbar({
       <IeltsGameModal
         isOpen={ieltsGamesOpen}
         onClose={() => setIeltsGamesOpen(false)}
+      />
+
+      <AdminModal
+        isOpen={adminModalOpen}
+        onClose={() => setAdminModalOpen(false)}
       />
 
       {/* Main Single-Row Sticky Header */}
@@ -205,7 +225,7 @@ export default function Navbar({
                 }`}
               >
                 <Award className="w-3.5 h-3.5 text-sky-500" />
-                <span>SAT Mock</span>
+                <span>5,000+ Mock Testlar</span>
               </Link>
 
               <button
@@ -226,10 +246,10 @@ export default function Navbar({
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5 text-cyan-500" />
-                <span>5,000+ Savollar</span>
+                <span>Savollar Bazasi</span>
               </Link>
 
-              {/* Tools Dropdown (Vositalar: Desmos, Formulalar, Lug'at, IELTS O'yinlar, AI Speaking) */}
+              {/* Tools Dropdown */}
               <div className="relative" ref={toolsDropdownRef}>
                 <button
                   onClick={() => { sound.playClick(); setToolsDropdownOpen(!toolsDropdownOpen); }}
@@ -302,6 +322,19 @@ export default function Navbar({
                         </div>
                       </button>
                     )}
+
+                    <div className="w-full h-px bg-slate-200 dark:bg-slate-800 my-1" />
+
+                    <button
+                      onClick={handleOpenAdminModal}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-left"
+                    >
+                      <ShieldAlert className="w-4 h-4 text-cyan-500" />
+                      <div>
+                        <span>Admin Boshqaruv Paneli</span>
+                        <span className="text-[10px] text-slate-400 block font-normal">Statistika va testlar boshqaruvi</span>
+                      </div>
+                    </button>
                   </div>
                 )}
               </div>
@@ -352,7 +385,7 @@ export default function Navbar({
                 </span>
               </button>
 
-              {/* Teacher Test Studio Button (Only visible if logged in as teacher) */}
+              {/* Teacher Test Studio Button */}
               {isTeacher && (
                 <button
                   onClick={() => { sound.playClick(); setTeacherStudioOpen(true); }}
@@ -364,7 +397,7 @@ export default function Navbar({
                 </button>
               )}
 
-              {/* Auth / Profile Button */}
+              {/* Auth / Profile & Analytics Button */}
               <button
                 onClick={() => { sound.playClick(); setAuthModalOpen(true); }}
                 className={`inline-flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold border transition-all shrink-0 ${
@@ -372,7 +405,7 @@ export default function Navbar({
                     ? 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200'
                     : 'bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border-cyan-500/30'
                 }`}
-                title={user ? `${user.name} (${user.role === 'teacher' ? 'Ustoz' : "O'quvchi"})` : "Kirish / Ro'yxatdan o'tish"}
+                title={user ? `${user.name} (Profil & Tahlil)` : "Kirish / Ro'yxatdan o'tish"}
               >
                 {user ? (
                   <>
@@ -432,7 +465,7 @@ export default function Navbar({
               onClick={handleNavClick}
               className="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-              SAT Mock Testlar (Bluebook)
+              5,000+ Mock Testlar (Bluebook)
             </Link>
             <button
               onClick={scrollToIelts}
@@ -446,7 +479,7 @@ export default function Navbar({
               onClick={handleNavClick}
               className="block px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-              5,000+ Savollar Banki
+              Savollar Bazasi &amp; Kategoriyalar
             </Link>
             <button
               onClick={() => { handleNavClick(); handleOpenAiSpeaking(); }}
@@ -462,6 +495,13 @@ export default function Navbar({
               <span>IELTS Gamification &amp; O&apos;yinlar</span>
               <Gamepad2 className="w-4 h-4 text-amber-500" />
             </button>
+            <button
+              onClick={() => { handleNavClick(); handleOpenAdminModal(); }}
+              className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-cyan-600 dark:text-cyan-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between"
+            >
+              <span>Admin Boshqaruv Markazi</span>
+              <ShieldAlert className="w-4 h-4 text-cyan-500" />
+            </button>
             {isTeacher && (
               <button
                 onClick={() => { handleNavClick(); setTeacherStudioOpen(true); }}
@@ -469,24 +509,6 @@ export default function Navbar({
               >
                 <span>Ustoz Test Studiyasi (Savol Qo&apos;shish)</span>
                 <PlusCircle className="w-4 h-4 text-amber-500" />
-              </button>
-            )}
-            {onOpenDesmos && (
-              <button
-                onClick={() => { handleNavClick(); onOpenDesmos(); }}
-                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between"
-              >
-                <span>Desmos Kalkulyator</span>
-                <Calculator className="w-4 h-4 text-emerald-500" />
-              </button>
-            )}
-            {onOpenDictionary && (
-              <button
-                onClick={() => { handleNavClick(); onOpenDictionary(); }}
-                className="w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between"
-              >
-                <span>Akademik Lug&apos;at (CEFR &amp; SAT)</span>
-                <Sparkles className="w-4 h-4 text-purple-500" />
               </button>
             )}
             <button
@@ -500,7 +522,7 @@ export default function Navbar({
               onClick={() => { handleNavClick(); setAuthModalOpen(true); }}
               className="w-full text-left px-3 py-2 rounded-xl text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between"
             >
-              <span>{user ? `Profil (${user.name})` : "Kirish / Ro'yxatdan O'tish"}</span>
+              <span>{user ? `Profil & Tahlil (${user.name})` : "Kirish / Ro'yxatdan O'tish"}</span>
               <User className="w-4 h-4" />
             </button>
           </div>

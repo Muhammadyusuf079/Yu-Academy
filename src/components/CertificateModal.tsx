@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Award, ShieldCheck, Printer, CheckCircle2, X, Download, Palette, Sparkles } from 'lucide-react';
 import { sound } from '@/lib/sound';
+import { useAuth } from '@/lib/auth-store';
 
 interface CertificateModalProps {
   isOpen: boolean;
@@ -20,14 +21,22 @@ export default function CertificateModal({
   examTitle,
   scoreDisplay,
   percentile,
-  initialCandidateName = 'Mehmon O\'quvchi',
+  initialCandidateName,
 }: CertificateModalProps) {
-  const [candidateName, setCandidateName] = useState(initialCandidateName);
+  const { user } = useAuth();
+  const [candidateName, setCandidateName] = useState(initialCandidateName || user?.name || 'Mehmon O\'quvchi');
   const [certCode, setCertCode] = useState('');
   const [issueDate, setIssueDate] = useState('');
   const [certTheme, setCertTheme] = useState<'ivory' | 'royal_dark'>('ivory');
 
   useEffect(() => {
+    // If user is logged in, automatically inject their real name
+    if (user?.name) {
+      setCandidateName(user.name);
+    } else if (initialCandidateName) {
+      setCandidateName(initialCandidateName);
+    }
+
     // Generate unique verifiable certificate serial
     const randomNum = Math.floor(100000 + Math.random() * 900000);
     setCertCode(`YU-2026-CERT-${randomNum}`);
@@ -39,7 +48,7 @@ export default function CertificateModal({
       day: 'numeric',
     });
     setIssueDate(formatted);
-  }, [isOpen]);
+  }, [isOpen, user, initialCandidateName]);
 
   if (!isOpen) return null;
 
@@ -83,6 +92,7 @@ export default function CertificateModal({
           <button
             onClick={() => { sound.playClick(); onClose(); }}
             className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-all"
+            title="Yopish (Chiqish)"
           >
             <X className="w-5 h-5" />
           </button>
@@ -96,15 +106,15 @@ export default function CertificateModal({
               : 'bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-white border-8 border-amber-500/60 shadow-black/60'
           }`}
         >
-          {/* Subtle Decorative Corners */}
-          <div className="absolute top-3 left-3 w-10 h-10 border-t-4 border-l-4 border-amber-500/70" />
-          <div className="absolute top-3 right-3 w-10 h-10 border-t-4 border-r-4 border-amber-500/70" />
-          <div className="absolute bottom-3 left-3 w-10 h-10 border-b-4 border-l-4 border-amber-500/70" />
-          <div className="absolute bottom-3 right-3 w-10 h-10 border-b-4 border-r-4 border-amber-500/70" />
+          {/* Decorative Corners */}
+          <div className="absolute top-3 left-3 w-12 h-12 border-t-4 border-l-4 border-amber-500/70" />
+          <div className="absolute top-3 right-3 w-12 h-12 border-t-4 border-r-4 border-amber-500/70" />
+          <div className="absolute bottom-3 left-3 w-12 h-12 border-b-4 border-l-4 border-amber-500/70" />
+          <div className="absolute bottom-3 right-3 w-12 h-12 border-b-4 border-r-4 border-amber-500/70" />
 
           {/* Seal / Emblem */}
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 text-slate-950 shadow-xl shadow-amber-500/30 mb-4 border-2 border-white/50">
-            <Award className="w-9 h-9" />
+          <div className="inline-flex items-center justify-center w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 text-slate-950 shadow-2xl shadow-amber-500/30 mb-4 border-2 border-white/60">
+            <Award className="w-10 h-10" />
           </div>
 
           {/* Certificate Header */}
@@ -126,14 +136,14 @@ export default function CertificateModal({
             This official credential confirms that
           </p>
 
-          {/* Student Editable Name Box */}
-          <div className="max-w-md mx-auto mb-2">
+          {/* Student Editable Name Box - Auto Filled */}
+          <div className="max-w-lg mx-auto mb-2">
             <input
               type="text"
               value={candidateName}
               onChange={(e) => setCandidateName(e.target.value)}
               placeholder="Ism va Familiyangizni kiriting"
-              className={`w-full text-center text-xl sm:text-3xl font-serif font-black pb-1 bg-transparent border-b-2 focus:outline-none ${
+              className={`w-full text-center text-2xl sm:text-4xl font-serif font-black pb-1 bg-transparent border-b-2 focus:outline-none ${
                 certTheme === 'ivory'
                   ? 'text-blue-950 border-amber-600/70 focus:border-amber-700'
                   : 'text-amber-300 border-amber-400/60 focus:border-amber-300'
@@ -141,7 +151,7 @@ export default function CertificateModal({
             />
           </div>
           <p className="print:hidden text-[11px] text-slate-400 mb-6 italic">
-            (Ismingizni o&apos;zgartirish uchun matn ustiga bosing)
+            (Ismingiz akkauntingizdan avtomatik olindi • O&apos;zgartirish uchun matn ustiga bosing)
           </p>
 
           {/* Achievement Description */}
@@ -191,20 +201,20 @@ export default function CertificateModal({
             </div>
           </div>
 
-          {/* Signatures & Verification Grid */}
+          {/* Prominent Large Signatures & Verification Grid */}
           <div
-            className={`grid grid-cols-3 items-end gap-4 max-w-xl mx-auto pt-4 border-t ${
-              certTheme === 'ivory' ? 'border-amber-200' : 'border-slate-800'
+            className={`grid grid-cols-3 items-end gap-6 max-w-2xl mx-auto pt-6 border-t ${
+              certTheme === 'ivory' ? 'border-amber-300' : 'border-slate-800'
             }`}
           >
             
             {/* Signature 1: Academic Director */}
             <div className="flex flex-col items-center">
-              <div className="h-16 flex items-end justify-center mb-1">
+              <div className="h-20 sm:h-24 flex items-end justify-center mb-1">
                 <img
                   src="/assets/images/signatures/signature_academic_director.png"
                   alt="Academic Director Signature"
-                  className={`max-h-16 max-w-[130px] object-contain -rotate-2 ${
+                  className={`max-h-20 sm:max-h-24 max-w-[180px] sm:max-w-[220px] object-contain -rotate-2 ${
                     certTheme === 'royal_dark'
                       ? 'filter invert brightness-200 contrast-125'
                       : 'contrast-125'
@@ -212,16 +222,19 @@ export default function CertificateModal({
                 />
               </div>
               <div
-                className={`w-full border-t pt-1 text-center ${
-                  certTheme === 'ivory' ? 'border-slate-400' : 'border-slate-600'
+                className={`w-full border-t-2 pt-1 text-center ${
+                  certTheme === 'ivory' ? 'border-slate-600' : 'border-slate-500'
                 }`}
               >
                 <span
-                  className={`text-[11px] font-bold block ${
-                    certTheme === 'ivory' ? 'text-slate-900' : 'text-slate-200'
+                  className={`text-xs sm:text-sm font-bold block ${
+                    certTheme === 'ivory' ? 'text-slate-950' : 'text-slate-100'
                   }`}
                 >
                   Head of Academic Board
+                </span>
+                <span className="text-[10px] text-slate-500 block">
+                  Prof. D. Campbell, Ph.D.
                 </span>
               </div>
             </div>
@@ -229,16 +242,16 @@ export default function CertificateModal({
             {/* Central Verification QR/Badge */}
             <div className="flex flex-col items-center justify-center">
               <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-md mb-1 border ${
+                className={`w-14 h-14 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-md mb-1 border ${
                   certTheme === 'ivory'
                     ? 'bg-emerald-50 border-emerald-300'
                     : 'bg-slate-900 border-emerald-500/40'
                 }`}
               >
-                <ShieldCheck className="w-7 h-7" />
+                <ShieldCheck className="w-8 h-8" />
               </div>
               <span
-                className={`text-[10px] font-mono font-bold block ${
+                className={`text-[10px] sm:text-xs font-mono font-bold block ${
                   certTheme === 'ivory' ? 'text-slate-800' : 'text-slate-300'
                 }`}
               >
@@ -252,11 +265,11 @@ export default function CertificateModal({
 
             {/* Signature 2: Chief Assessment Officer */}
             <div className="flex flex-col items-center">
-              <div className="h-16 flex items-end justify-center mb-1">
+              <div className="h-20 sm:h-24 flex items-end justify-center mb-1">
                 <img
                   src="/assets/images/signatures/signature_lead_examiner.png"
                   alt="Lead Examiner Signature"
-                  className={`max-h-16 max-w-[130px] object-contain rotate-1 ${
+                  className={`max-h-20 sm:max-h-24 max-w-[180px] sm:max-w-[220px] object-contain rotate-1 ${
                     certTheme === 'royal_dark'
                       ? 'filter invert brightness-200 contrast-125'
                       : 'contrast-125'
@@ -264,16 +277,19 @@ export default function CertificateModal({
                 />
               </div>
               <div
-                className={`w-full border-t pt-1 text-center ${
-                  certTheme === 'ivory' ? 'border-slate-400' : 'border-slate-600'
+                className={`w-full border-t-2 pt-1 text-center ${
+                  certTheme === 'ivory' ? 'border-slate-600' : 'border-slate-500'
                 }`}
               >
                 <span
-                  className={`text-[11px] font-bold block ${
-                    certTheme === 'ivory' ? 'text-slate-900' : 'text-slate-200'
+                  className={`text-xs sm:text-sm font-bold block ${
+                    certTheme === 'ivory' ? 'text-slate-950' : 'text-slate-100'
                   }`}
                 >
                   Chief Assessment Officer
+                </span>
+                <span className="text-[10px] text-slate-500 block">
+                  Dr. E. Harrison, M.Ed.
                 </span>
               </div>
             </div>
@@ -302,7 +318,7 @@ export default function CertificateModal({
         <div className="print:hidden mt-6 flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={handlePrint}
-            className="px-6 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-yellow-400 hover:brightness-110 text-slate-950 shadow-lg shadow-amber-500/25 flex items-center gap-2 transition-all"
+            className="px-6 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-500 to-yellow-400 hover:brightness-110 text-slate-950 shadow-lg shadow-amber-500/25 flex items-center gap-2 transition-all hover:scale-105 active:scale-95"
           >
             <Printer className="w-4 h-4" />
             <span>Chop Etish / PDF Saqlash</span>
@@ -313,7 +329,7 @@ export default function CertificateModal({
               sound.playClick();
               window.open(`/api/verify-certificate?id=${certCode}`, '_blank');
             }}
-            className="px-5 py-3 rounded-xl font-bold text-sm bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-2 transition-all"
+            className="px-5 py-3.5 rounded-xl font-bold text-sm bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-2 transition-all"
           >
             <ShieldCheck className="w-4 h-4" />
             <span>Reestrda Tekshirish</span>
@@ -324,10 +340,10 @@ export default function CertificateModal({
               sound.playClick();
               onClose();
             }}
-            className="px-5 py-3 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all"
+            className="px-5 py-3.5 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition-all"
           >
             <X className="w-4 h-4" />
-            <span>Yopish</span>
+            <span>Yopish / Chiqish</span>
           </button>
         </div>
 

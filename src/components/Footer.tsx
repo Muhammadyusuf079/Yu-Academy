@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { MapPin, Globe, Sparkles, Shield, Heart, Award, Headphones, BookOpen } from 'lucide-react';
+import { MapPin, Globe, Sparkles, Shield, Heart, Award, Headphones, BookOpen, ShieldAlert } from 'lucide-react';
 import YuLogo from '@/components/YuLogo';
 
 export default function Footer() {
@@ -40,23 +40,20 @@ export default function Footer() {
           {/* Quick Links */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">
-              Imtihonlar
+              Imtihonlar &amp; Testlar
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/tests" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Digital SAT Math (44 savol)</Link>
+                <Link href="/tests" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Digital SAT Mock Testlar</Link>
               </li>
               <li>
-                <Link href="/tests" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">SAT Reading &amp; Writing (54)</Link>
+                <Link href="/tests" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Cambridge IELTS 19 Simulyatsiya</Link>
               </li>
               <li>
-                <Link href="/tests" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">IELTS Academic Reading</Link>
+                <Link href="/questions" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">5,000+ Savollar Bazasi</Link>
               </li>
               <li>
-                <Link href="/tests" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">IELTS Listening Simulation</Link>
-              </li>
-              <li>
-                <Link href="/tests" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">College Board Scoring</Link>
+                <Link href="/tests" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">College Board Bluebook Baholash</Link>
               </li>
             </ul>
           </div>
@@ -64,20 +61,17 @@ export default function Footer() {
           {/* Interaktiv Asboblar */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">
-              Asboblar
+              Interaktiv Asboblar
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/questions" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">1,850+ Savollar Banki</Link>
+                <a href="#shadowing-studio" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">IELTS Shadowing Studio (Erkak &amp; Ayol)</a>
               </li>
               <li>
-                <Link href="/tests" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Desmos Kalkulyatori</Link>
+                <a href="#ielts-hub-section" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">AI Voice Speaking Partner</a>
               </li>
               <li>
                 <a href="#grant-calculator" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">AQSH Grant Kalkulyatori</a>
-              </li>
-              <li>
-                <a href="#shadowing-studio" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">IELTS Shadowing Studio</a>
               </li>
               <li>
                 <a href="#yu-pricing-section" className="hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Pro &amp; VIP Tariflar</a>
@@ -88,22 +82,22 @@ export default function Footer() {
           {/* Huquqiy & Standartlar */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-4">
-              Standartlar
+              Standartlar &amp; Xavfsizlik
             </h4>
             <div className="space-y-3 text-xs text-slate-500">
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-semibold">
                 <Shield className="w-4 h-4 text-emerald-500" />
-                <span>College Board 2026</span>
+                <span>College Board 2026 Standarti</span>
               </div>
               <p className="leading-relaxed">
-                Bluebook rasmiy imtihon interfeysi va Desmos kalkulyator integratsiyasi.
+                Bluebook rasmiy imtihon interfeysi va o&apos;rnatilgan Desmos kalkulyatori.
               </p>
               <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-semibold pt-1">
                 <Sparkles className="w-4 h-4 text-amber-500" />
                 <span>Cambridge IELTS</span>
               </div>
               <p className="leading-relaxed">
-                Band 8.5 va 9.0 native speaker audio modellari.
+                Band 8.5 va 9.0 native speaker audio modellari va rasmiy mezonlar.
               </p>
             </div>
           </div>
