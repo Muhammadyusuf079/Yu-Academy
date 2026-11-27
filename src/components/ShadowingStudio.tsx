@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Headphones, Play, Pause, Volume2, Sparkles, Check, User, Mic, Gauge, FastForward } from 'lucide-react';
 import { SHADOWING_PHRASES_2026 } from '@/data/shadowing';
 import { sound } from '@/lib/sound';
+import { speakTextWithGender, stopSpeech } from '@/lib/speech';
 
 export default function ShadowingStudio() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -50,85 +51,21 @@ export default function ShadowingStudio() {
 
   const playSpeech = (text: string, gender: 'female' | 'male' = voiceGender, speed: number = speechSpeed) => {
     sound.playClick();
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-
-    window.speechSynthesis.cancel();
     if (isPlaying) {
+      stopSpeech();
       setIsPlaying(false);
       return;
     }
 
-    // Small timeout to allow previous cancel to finish cleanly across Safari and Chrome
-    setTimeout(() => {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-GB';
-      utterance.rate = speed;
-
-      const voices = (browserVoices.length > 0 ? browserVoices : window.speechSynthesis.getVoices()) || [];
-      const enVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
-
-      if (gender === 'female') {
-        // High priority female voices
-        const femaleVoice = enVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return (
-            name.includes('female') ||
-            name.includes('samantha') ||
-            name.includes('victoria') ||
-            name.includes('karen') ||
-            name.includes('moira') ||
-            name.includes('tessa') ||
-            name.includes('fiona') ||
-            name.includes('serena') ||
-            name.includes('kate') ||
-            name.includes('stephanie') ||
-            name.includes('zira') ||
-            name.includes('jenny') ||
-            name.includes('libby') ||
-            name.includes('sonia') ||
-            name.includes('google uk english female') ||
-            name.includes('google us english')
-          );
-        }) || enVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return !name.includes('male') && !name.includes('daniel') && !name.includes('alex') && !name.includes('david') && !name.includes('george') && !name.includes('oliver') && !name.includes('fred');
-        }) || enVoices[0];
-
-        if (femaleVoice) {
-          utterance.voice = femaleVoice;
-        }
-        utterance.pitch = 1.35; // Distinct, crisp, bright female tone
-      } else {
-        // High priority male voices
-        const maleVoice = enVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return (
-            name.includes('male') ||
-            name.includes('daniel') ||
-            name.includes('george') ||
-            name.includes('oliver') ||
-            name.includes('alex') ||
-            name.includes('david') ||
-            name.includes('fred') ||
-            name.includes('ryan') ||
-            name.includes('google uk english male')
-          );
-        }) || enVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return !name.includes('female') && !name.includes('samantha') && !name.includes('victoria') && !name.includes('karen') && !name.includes('zira');
-        }) || enVoices[1] || enVoices[0];
-
-        if (maleVoice) {
-          utterance.voice = maleVoice;
-        }
-        utterance.pitch = 0.85; // Deep, calm, authoritative male tone
-      }
-
-      utterance.onend = () => setIsPlaying(false);
-      utterance.onerror = () => setIsPlaying(false);
-      setIsPlaying(true);
-      window.speechSynthesis.speak(utterance);
-    }, 40);
+    setIsPlaying(true);
+    speakTextWithGender(
+      text,
+      gender,
+      speed,
+      browserVoices,
+      () => setIsPlaying(false),
+      () => setIsPlaying(false)
+    );
   };
 
   return (

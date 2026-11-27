@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { X, Search, Sparkles, Volume2, BookA, GraduationCap, Globe, Lightbulb, Filter, Layers, CreditCard, RotateCw } from 'lucide-react';
 import { getAll10000DictionaryWords, DICTIONARY_TOPICS, CefrLevel } from '@/data/dictionary-expanded-generator';
 import { sound } from '@/lib/sound';
+import { speakTextWithGender, stopSpeech } from '@/lib/speech';
 import { DictionaryEntry } from '@/types';
 
 interface DictionaryModalProps {
@@ -70,13 +71,7 @@ export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProp
 
   const speakWord = (word: string) => {
     sound.playClick();
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(word);
-      utterance.lang = voiceAccent === 'UK' ? 'en-GB' : 'en-US';
-      utterance.rate = 0.88;
-      window.speechSynthesis.speak(utterance);
-    }
+    speakTextWithGender(word, 'female', 0.88);
   };
 
   const getLevelBadge = (level?: string, ieltsBand?: string) => {

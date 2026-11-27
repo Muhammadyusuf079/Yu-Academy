@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   Sparkles,
   BookOpen,
+  BookA,
   Calculator,
   Award,
   Menu,
@@ -36,6 +37,7 @@ import TeacherStudioModal from '@/components/TeacherStudioModal';
 import AiSpeakingPartnerModal from '@/components/AiSpeakingPartnerModal';
 import IeltsGameModal from '@/components/IeltsGameModal';
 import AdminModal from '@/components/AdminModal';
+import DictionaryModal from '@/components/DictionaryModal';
 import YuLogo from '@/components/YuLogo';
 
 interface NavbarProps {
@@ -65,6 +67,7 @@ export default function Navbar({
   const [speakingAiOpen, setSpeakingAiOpen] = useState(false);
   const [ieltsGamesOpen, setIeltsGamesOpen] = useState(false);
   const [adminModalOpen, setAdminModalOpen] = useState(false);
+  const [dictModalInternalOpen, setDictModalInternalOpen] = useState(false);
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
 
   const toolsDropdownRef = useRef<HTMLDivElement | null>(null);
@@ -153,6 +156,17 @@ export default function Navbar({
     }
   };
 
+  const handleOpenDictionary = () => {
+    sound.playClick();
+    setMobileMenuOpen(false);
+    setToolsDropdownOpen(false);
+    if (onOpenDictionary) {
+      onOpenDictionary();
+    } else {
+      setDictModalInternalOpen(true);
+    }
+  };
+
   return (
     <>
       {/* Modals */}
@@ -185,6 +199,11 @@ export default function Navbar({
       <AdminModal
         isOpen={adminModalOpen}
         onClose={() => setAdminModalOpen(false)}
+      />
+
+      <DictionaryModal
+        isOpen={dictModalInternalOpen}
+        onClose={() => setDictModalInternalOpen(false)}
       />
 
       {/* Main Single-Row Sticky Header */}
@@ -248,6 +267,19 @@ export default function Navbar({
                 <BookOpen className="w-3.5 h-3.5 text-cyan-500" />
                 <span>Savollar Bazasi</span>
               </Link>
+
+              {/* 10,000+ Lug'at Header Button */}
+              <button
+                onClick={handleOpenDictionary}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs xl:text-sm font-bold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition-all cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+                title="10,000+ Akademik va Umumiy Lug'at (A1 - C2)"
+              >
+                <BookA className="w-3.5 h-3.5 text-amber-500" />
+                <span>10,000+ Lug&apos;at</span>
+                <span className="text-[10px] bg-amber-500/20 text-amber-600 dark:text-amber-400 font-extrabold px-1.5 py-0.5 rounded-full hidden xl:inline">
+                  A1–C2
+                </span>
+              </button>
 
               {/* Tools Dropdown */}
               <div className="relative" ref={toolsDropdownRef}>
@@ -473,6 +505,16 @@ export default function Navbar({
             >
               <span>IELTS 4 Skills Hub</span>
               <Headphones className="w-4 h-4 text-emerald-500" />
+            </button>
+            <button
+              onClick={handleOpenDictionary}
+              className="w-full text-left px-3 py-2 rounded-xl text-sm font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10 border border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/20 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <BookA className="w-4 h-4 text-amber-500" />
+                <span>10,000+ Akademik Lug&apos;at (A1–C2)</span>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
             <Link
               href="/questions"

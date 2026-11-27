@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { useGamification } from '@/lib/xp-store';
+import { speakTextWithGender, stopSpeech } from '@/lib/speech';
 import confetti from 'canvas-confetti';
 
 interface AiSpeakingPartnerModalProps {
@@ -184,82 +185,21 @@ export default function AiSpeakingPartnerModal({ isOpen, onClose }: AiSpeakingPa
   // Speak AI prompt with selected gender voice and speed
   const speakExaminerPrompt = (text: string) => {
     sound.playClick();
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-
-    window.speechSynthesis.cancel();
     if (isAiSpeaking) {
+      stopSpeech();
       setIsAiSpeaking(false);
       return;
     }
 
-    setTimeout(() => {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-GB';
-      utterance.rate = speechSpeed;
-
-      const voices = (browserVoices.length > 0 ? browserVoices : window.speechSynthesis.getVoices()) || [];
-      const enVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
-
-      if (voiceGender === 'female') {
-        const femaleVoice = enVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return (
-            name.includes('female') ||
-            name.includes('samantha') ||
-            name.includes('victoria') ||
-            name.includes('karen') ||
-            name.includes('moira') ||
-            name.includes('tessa') ||
-            name.includes('fiona') ||
-            name.includes('serena') ||
-            name.includes('kate') ||
-            name.includes('stephanie') ||
-            name.includes('zira') ||
-            name.includes('jenny') ||
-            name.includes('libby') ||
-            name.includes('google uk english female') ||
-            name.includes('google us english')
-          );
-        }) || enVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return !name.includes('male') && !name.includes('daniel') && !name.includes('alex') && !name.includes('david');
-        }) || enVoices[0];
-
-        if (femaleVoice) {
-          utterance.voice = femaleVoice;
-        }
-        utterance.pitch = 1.35; // Distinct female pitch
-      } else {
-        const maleVoice = enVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return (
-            name.includes('male') ||
-            name.includes('daniel') ||
-            name.includes('george') ||
-            name.includes('oliver') ||
-            name.includes('alex') ||
-            name.includes('david') ||
-            name.includes('fred') ||
-            name.includes('ryan') ||
-            name.includes('google uk english male')
-          );
-        }) || enVoices.find(v => {
-          const name = v.name.toLowerCase();
-          return !name.includes('female') && !name.includes('samantha') && !name.includes('victoria');
-        }) || enVoices[1] || enVoices[0];
-
-        if (maleVoice) {
-          utterance.voice = maleVoice;
-        }
-        utterance.pitch = 0.85; // Deep authoritative male pitch
-      }
-
-      utterance.onend = () => setIsAiSpeaking(false);
-      utterance.onerror = () => setIsAiSpeaking(false);
-
-      setIsAiSpeaking(true);
-      window.speechSynthesis.speak(utterance);
-    }, 40);
+    setIsAiSpeaking(true);
+    speakTextWithGender(
+      text,
+      voiceGender,
+      speechSpeed,
+      browserVoices,
+      () => setIsAiSpeaking(false),
+      () => setIsAiSpeaking(false)
+    );
   };
 
   const startListening = () => {
