@@ -132,6 +132,21 @@ export function useGamification() {
     [streak, completedToday]
   );
 
+  const activatePlanDirectly = useCallback(
+    (planId: 'free' | 'plus' | 'pro' | 'premium') => {
+      try {
+        localStorage.setItem(STORAGE_KEY_PLAN, planId);
+      } catch {}
+      setActivePlan(planId);
+      sound.playSuccess();
+      try {
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
+      } catch {}
+      triggerUpdate(getStoredXP(), streak, planId, completedToday);
+    },
+    [streak, completedToday]
+  );
+
   const completeDailyTask = useCallback(
     (tier: 'light' | 'medium' | 'hard') => {
       if (completedToday[tier]) return; // already done today
@@ -168,6 +183,7 @@ export function useGamification() {
     notification,
     addXP,
     claimPlanWithXP,
+    activatePlanDirectly,
     completeDailyTask,
   };
 }

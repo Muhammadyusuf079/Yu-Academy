@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { X, Search, Sparkles, Volume2, BookA, GraduationCap, Globe, Lightbulb, Filter, Layers, CreditCard, RotateCw } from 'lucide-react';
-import { YU_DICTIONARY_DATABASE } from '@/data/dictionary';
+import { getAll10000DictionaryWords, DICTIONARY_TOPICS, CefrLevel } from '@/data/dictionary-expanded-generator';
 import { sound } from '@/lib/sound';
 import { DictionaryEntry } from '@/types';
 
@@ -13,8 +13,8 @@ interface DictionaryModalProps {
 
 export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState<'all' | 'ielts' | 'sat' | 'math'>('all');
-  const [filterLevel, setFilterLevel] = useState<'all' | 'B1' | 'B2' | 'C1' | 'C2'>('all');
+  const [filterCategory, setFilterCategory] = useState<'all' | 'ielts' | 'sat' | 'math' | 'academic'>('all');
+  const [filterLevel, setFilterLevel] = useState<'all' | CefrLevel>('all');
   const [filterBand, setFilterBand] = useState<string>('all');
   const [filterTopic, setFilterTopic] = useState<string>('all');
   const [voiceAccent, setVoiceAccent] = useState<'US' | 'UK'>('US');
@@ -22,10 +22,12 @@ export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProp
   const [cardIndex, setCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const allWords = useMemo(() => getAll10000DictionaryWords(), []);
+
   const filteredWords = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
 
-    return YU_DICTIONARY_DATABASE.filter((item: DictionaryEntry) => {
+    return allWords.filter((item: DictionaryEntry) => {
       // 1. Search text filter
       if (q) {
         const matchText =
@@ -42,9 +44,10 @@ export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProp
         if (filterCategory === 'ielts' && item.category !== 'ielts') return false;
         if (filterCategory === 'sat' && item.category !== 'sat') return false;
         if (filterCategory === 'math' && item.category !== 'math') return false;
+        if (filterCategory === 'academic' && item.category !== 'academic') return false;
       }
 
-      // 3. CEFR Level filter (B1, B2, C1, C2)
+      // 3. CEFR Level filter (A1 - C2)
       if (filterLevel !== 'all' && item.level !== filterLevel) {
         return false;
       }
@@ -63,7 +66,7 @@ export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProp
 
       return true;
     }).slice(0, 80);
-  }, [searchQuery, filterCategory, filterLevel, filterBand, filterTopic]);
+  }, [allWords, searchQuery, filterCategory, filterLevel, filterBand, filterTopic]);
 
   const speakWord = (word: string) => {
     sound.playClick();
@@ -80,7 +83,7 @@ export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProp
     if (level === 'C2') {
       return (
         <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30 flex items-center gap-1 shadow-sm">
-          <span>🏆 C2 Mastery</span>
+          <span>🏆 C2 Proficiency</span>
           {ieltsBand && <span>• Band {ieltsBand}</span>}
         </span>
       );
@@ -101,9 +104,23 @@ export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProp
         </span>
       );
     }
+    if (level === 'B1') {
+      return (
+        <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+          📗 B1 Intermediate
+        </span>
+      );
+    }
+    if (level === 'A2') {
+      return (
+        <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30">
+          📙 A2 Pre-Intermediate
+        </span>
+      );
+    }
     return (
       <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600/40">
-        B1 Core
+        🎯 A1 Elementary
       </span>
     );
   };
@@ -125,13 +142,13 @@ export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProp
               </div>
               <div>
                 <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  Akademik Lug&apos;at &amp; Darajalar Bazasi
+                  10,000+ Akademik Lug&apos;at &amp; Barcha Darajalar
                   <span className="text-[10px] font-extrabold uppercase bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30">
-                    B1 • B2 • C1 • C2
+                    A1 • A2 • B1 • B2 • C1 • C2
                   </span>
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Digital SAT va IELTS (Band 7.0 - 9.0) imtihonlari uchun darajalar va mavzular bo&apos;yicha saralangan
+                  Digital SAT va IELTS (Band 6.0 - 9.0) imtihonlari hamda barcha darajalar uchun 10,000+ so&apos;zlar bazasi
                 </p>
               </div>
             </div>
@@ -257,9 +274,9 @@ export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProp
             </div>
 
             {/* CEFR Level Filters */}
-            <div className="flex items-center gap-1 bg-slate-200/60 dark:bg-slate-950/60 p-1 rounded-xl border border-slate-200 dark:border-slate-800 ml-auto">
-              <span className="text-[11px] font-bold text-slate-500 px-1 hidden sm:inline">CEFR Daraja:</span>
-              {(['all', 'B2', 'C1', 'C2'] as const).map((lvl) => (
+            <div className="flex items-center gap-1 bg-slate-200/60 dark:bg-slate-950/60 p-1 rounded-xl border border-slate-200 dark:border-slate-800 ml-auto flex-wrap">
+              <span className="text-[11px] font-bold text-slate-500 px-1 hidden sm:inline">CEFR:</span>
+              {(['all', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const).map((lvl) => (
                 <button
                   key={lvl}
                   onClick={() => { sound.playClick(); setFilterLevel(lvl); }}
@@ -271,6 +288,12 @@ export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProp
                         ? 'bg-amber-500 text-slate-950 font-black'
                         : lvl === 'B2'
                         ? 'bg-cyan-500 text-slate-950 font-black'
+                        : lvl === 'B1'
+                        ? 'bg-emerald-500 text-white'
+                        : lvl === 'A2'
+                        ? 'bg-orange-500 text-white'
+                        : lvl === 'A1'
+                        ? 'bg-blue-500 text-white'
                         : 'bg-slate-700 text-white'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}

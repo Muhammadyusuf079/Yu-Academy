@@ -13,24 +13,67 @@ import {
   Flame,
   Award,
   Users,
+  CreditCard,
+  CheckCircle2,
+  Lock,
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { useGamification } from '@/lib/xp-store';
+import { useAuth } from '@/lib/auth-store';
+import AuthModal from '@/components/AuthModal';
 import confetti from 'canvas-confetti';
 
 export default function PricingSection() {
+  const { user } = useAuth();
   const [role, setRole] = useState<'student' | 'teacher'>('student');
   const [period, setPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authReason, setAuthReason] = useState<string | null>(null);
+  const [checkoutModalPlan, setCheckoutModalPlan] = useState<any | null>(null);
+  const [activatedSuccessPlan, setActivatedSuccessPlan] = useState<string | null>(null);
 
-  const { xp, activePlan, claimPlanWithXP } = useGamification();
+  const { xp, activePlan, claimPlanWithXP, activatePlanDirectly } = useGamification();
+
+  const handleSelectPlan = (plan: any) => {
+    sound.playClick();
+    if (!user) {
+      setAuthReason(`"${plan.name}" tarifini tanlash va faollashtirish uchun avval tizimda ro'yxatdan o'ting yoki profilingizga kiring.`);
+      setAuthModalOpen(true);
+      return;
+    }
+
+    if (plan.id === 'free') {
+      activatePlanDirectly('free');
+      setActivatedSuccessPlan("Doimiy Bepul Boshlang'ich");
+      return;
+    }
+
+    setCheckoutModalPlan(plan);
+  };
+
+  const handleConfirmActivation = (planId: 'free' | 'plus' | 'pro' | 'premium', planName: string) => {
+    sound.playSuccess();
+    activatePlanDirectly(planId);
+    setCheckoutModalPlan(null);
+    setActivatedSuccessPlan(planName);
+    try {
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.55 } });
+    } catch {}
+  };
 
   const handleClaimXP = (planId: 'plus' | 'pro' | 'premium', cost: number, planName: string) => {
     sound.playClick();
+    if (!user) {
+      setAuthReason(`XP bilan tarif faollashtirish uchun avval tizimga kiring.`);
+      setAuthModalOpen(true);
+      return;
+    }
+
     const ok = claimPlanWithXP(planId, cost);
     if (!ok) {
       alert(`Kechirasiz, ${planName} tarifini faollashtirish uchun sizda yetarli XP mavjud emas.\n\nKerakli: ${cost.toLocaleString()} XP\nSizdagi ball: ${xp.toLocaleString()} XP\n\nKunlik rejalarni bajarib energiya to'plang!`);
     } else {
-      alert(`Tabriklaymiz! ${planName} tarifi ${cost.toLocaleString()} XP ga muvaffaqiyatli faollashtirildi! 🎉`);
+      setActivatedSuccessPlan(`${planName} (${cost.toLocaleString()} XP bilan)`);
     }
   };
 
@@ -334,26 +377,33 @@ export default function PricingSection() {
 
                 {/* Bottom Actions */}
                 <div className="space-y-2.5 pt-4 border-t border-slate-200 dark:border-slate-800">
-                  <Link
-                    href="/tests"
-                    onClick={() => sound.playClick()}
-                    className={`w-full py-3 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
-                      plan.featured
+                  <button
+                    onClick={() => handleSelectPlan(plan)}
+                    className={`w-full py-3 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                      isCurrent
+                        ? 'bg-emerald-600 text-white shadow-md'
+                        : plan.featured
                         ? 'bg-gradient-to-r from-cyan-400 via-sky-300 to-cyan-300 text-slate-950 hover:brightness-110 shadow-lg shadow-cyan-500/25 hover:scale-[1.02]'
                         : plan.isVip
                         ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:brightness-110 shadow-lg shadow-purple-500/25 hover:scale-[1.02]'
                         : 'bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700'
                     }`}
                   >
-                    <span>{plan.id === 'free' ? 'Doimiy Bepul Kirish' : `${plan.name} Tarifini Tanlash`}</span>
+                    <span>
+                      {isCurrent
+                        ? '✓ Sizda faol tarif'
+                        : plan.id === 'free'
+                        ? 'Doimiy Bepul Kirish'
+                        : `${plan.name} Tarifini Tanlash`}
+                    </span>
                     <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  </button>
 
                   {/* XP Claim Button */}
                   {plan.xpPrice !== null && (
                     <button
                       onClick={() => handleClaimXP(plan.id, plan.xpPrice!, plan.name)}
-                      className="w-full py-2.5 px-3 rounded-xl font-bold text-xs bg-slate-50 dark:bg-slate-900 border border-amber-500/40 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 flex items-center justify-center gap-1.5 transition-all"
+                      className="w-full py-2.5 px-3 rounded-xl font-bold text-xs bg-slate-50 dark:bg-slate-900 border border-amber-500/40 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                     >
                       <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                       <span>{plan.xpPrice.toLocaleString()} XP Bilan Faollashtirish</span>
@@ -368,6 +418,121 @@ export default function PricingSection() {
         </div>
 
       </div>
+
+      {/* Checkout & Plan Activation Modal */}
+      {checkoutModalPlan && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-900 dark:text-white space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center border border-cyan-500/20">
+                  <CreditCard className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black">{checkoutModalPlan.name} Tarifini Faollashtirish</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">YU Academy 2026 Xavfsiz To&apos;lov &amp; Ekotizim</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setCheckoutModalPlan(null)}
+                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl"
+              >
+                <XIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Plan Info Summary */}
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Foydalanuvchi:</span>
+                <span className="font-bold text-slate-900 dark:text-white">{user?.name} ({user?.email})</span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Tanlangan muddat:</span>
+                <span className="font-bold text-slate-900 dark:text-white">{period === 'monthly' ? '1 Oylik obuna' : '1 Yillik obuna (-20%)'}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm pt-2 border-t border-slate-200 dark:border-slate-700">
+                <span className="font-bold text-slate-700 dark:text-slate-300">To&apos;lov summasi:</span>
+                <span className="text-lg font-black text-cyan-600 dark:text-cyan-400">{checkoutModalPlan.priceUZS} (${checkoutModalPlan.priceUSD})</span>
+              </div>
+            </div>
+
+            {/* Activation Options */}
+            <div className="space-y-3">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">
+                Qulay to&apos;lov yoki test usulini tanlang:
+              </span>
+
+              {/* Instant 1-Click Demo Activation */}
+              <button
+                onClick={() => handleConfirmActivation(checkoutModalPlan.id, checkoutModalPlan.name)}
+                className="w-full p-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 text-slate-950 font-black text-sm flex items-center justify-between shadow-lg shadow-cyan-500/25 hover:brightness-110 active:scale-[0.99] transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Zap className="w-5 h-5 fill-slate-950" />
+                  <span>1-Sekundda Darhol Faollashtirish (Sinov)</span>
+                </div>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              {/* Online Payment Providers */}
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  onClick={() => handleConfirmActivation(checkoutModalPlan.id, checkoutModalPlan.name)}
+                  className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-cyan-500 dark:hover:border-cyan-500 text-left transition-all flex items-center gap-2.5 cursor-pointer bg-white dark:bg-slate-800"
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="text-xs font-bold">Payme / Click</span>
+                </button>
+                <button
+                  onClick={() => handleConfirmActivation(checkoutModalPlan.id, checkoutModalPlan.name)}
+                  className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-cyan-500 dark:hover:border-cyan-500 text-left transition-all flex items-center gap-2.5 cursor-pointer bg-white dark:bg-slate-800"
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-500 shrink-0" />
+                  <span className="text-xs font-bold">Uzcard / Humo / Visa</span>
+                </button>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-center text-slate-500 dark:text-slate-400">
+              🔒 256-bit SSL xavfsizlik protokoli bilan himoyalangan. Barcha huquqlar kafolatlangan.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Activated Success Modal */}
+      {activatedSuccessPlan && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-4">
+            <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white">
+              Tarif Muvaffaqiyatli Faollashtirildi! 🎉
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Sizning <b>{activatedSuccessPlan}</b> obunangiz to&apos;liq yoqildi. Barcha cheklovsiz imkoniyatlar siz uchun ochiq!
+            </p>
+            <div className="pt-2">
+              <button
+                onClick={() => setActivatedSuccessPlan(null)}
+                className="w-full py-3 rounded-xl bg-slate-900 dark:bg-slate-800 text-white font-bold text-xs hover:bg-slate-800 transition-all cursor-pointer"
+              >
+                Ajoyib, tushunarli!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Auth Modal Trigger when user is not logged in */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        defaultTab="register"
+        defaultRole={role}
+      />
     </section>
   );
 }

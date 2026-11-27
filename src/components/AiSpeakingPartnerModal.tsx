@@ -16,6 +16,8 @@ import {
   BrainCircuit,
   MessageSquare,
   HelpCircle,
+  User,
+  Gauge,
 } from 'lucide-react';
 import { sound } from '@/lib/sound';
 import { useGamification } from '@/lib/xp-store';
@@ -76,6 +78,22 @@ const SPEAKING_PROMPTS: QuestionPrompt[] = [
     suggestedVocab: ['meritocracy', 'fiscal burden', 'equitable access', 'socio-economic mobility', 'subsidize'],
     modelAnswer: "Providing universally subsidized higher education fosters equal socio-economic mobility and prevents generational inequality. However, it imposes a considerable fiscal burden on national budgets, which means governments must balance accessibility with uncompromising academic excellence.",
   },
+  {
+    id: 6,
+    part: 'Part 1',
+    topic: 'Daily Habits & Productivity',
+    examinerPrompt: "What is your daily routine for studying, and how do you maintain focus throughout the day?",
+    suggestedVocab: ['time-blocking', 'cognitive stamina', 'procrastination', 'optimal efficiency', 'interleaved learning'],
+    modelAnswer: "I adhere to a structured time-blocking method, dedicating my earliest morning hours to cognitively demanding tasks like SAT Math. By eliminating digital distractions and taking scheduled short breaks, I sustain peak mental clarity throughout intensive study sessions.",
+  },
+  {
+    id: 7,
+    part: 'Part 3',
+    topic: 'Global Economy & Digital Currencies',
+    examinerPrompt: "Do you believe cash will become completely obsolete in modern transactions?",
+    suggestedVocab: ['cashless society', 'digital ledger', 'financial inclusion', 'cybersecurity vulnerabilities', 'seamless transactions'],
+    modelAnswer: "The transition toward a cashless economy appears practically irreversible due to the seamless efficiency and transparency of digital payments. Nevertheless, complete obsolescence may be delayed until universal digital inclusion and robust cybersecurity infrastructures are fully guaranteed across all demographics.",
+  },
 ];
 
 export default function AiSpeakingPartnerModal({ isOpen, onClose }: AiSpeakingPartnerModalProps) {
@@ -84,6 +102,9 @@ export default function AiSpeakingPartnerModal({ isOpen, onClose }: AiSpeakingPa
   const [isAiSpeaking, setIsAiSpeaking] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [voiceGender, setVoiceGender] = useState<'female' | 'male'>('female');
+  const [speechSpeed, setSpeechSpeed] = useState<number>(1.0);
+  const [browserVoices, setBrowserVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [evaluation, setEvaluation] = useState<{
     bandScore: number;
     fluency: string;
@@ -95,6 +116,27 @@ export default function AiSpeakingPartnerModal({ isOpen, onClose }: AiSpeakingPa
   const recognitionRef = useRef<any>(null);
 
   const prompt = SPEAKING_PROMPTS[currentPromptIdx];
+
+  // Preload and cache browser voices
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+    const loadVoices = () => {
+      const v = window.speechSynthesis.getVoices();
+      if (v && v.length > 0) {
+        setBrowserVoices(v);
+      }
+    };
+
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   // Initialize Speech Recognition if supported
   useEffect(() => {
@@ -139,26 +181,85 @@ export default function AiSpeakingPartnerModal({ isOpen, onClose }: AiSpeakingPa
 
   if (!isOpen) return null;
 
-  // Speak AI prompt
+  // Speak AI prompt with selected gender voice and speed
   const speakExaminerPrompt = (text: string) => {
     sound.playClick();
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      if (isAiSpeaking) {
-        setIsAiSpeaking(false);
-        return;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+    window.speechSynthesis.cancel();
+    if (isAiSpeaking) {
+      setIsAiSpeaking(false);
+      return;
+    }
+
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-GB';
+      utterance.rate = speechSpeed;
+
+      const voices = (browserVoices.length > 0 ? browserVoices : window.speechSynthesis.getVoices()) || [];
+      const enVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
+
+      if (voiceGender === 'female') {
+        const femaleVoice = enVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return (
+            name.includes('female') ||
+            name.includes('samantha') ||
+            name.includes('victoria') ||
+            name.includes('karen') ||
+            name.includes('moira') ||
+            name.includes('tessa') ||
+            name.includes('fiona') ||
+            name.includes('serena') ||
+            name.includes('kate') ||
+            name.includes('stephanie') ||
+            name.includes('zira') ||
+            name.includes('jenny') ||
+            name.includes('libby') ||
+            name.includes('google uk english female') ||
+            name.includes('google us english')
+          );
+        }) || enVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return !name.includes('male') && !name.includes('daniel') && !name.includes('alex') && !name.includes('david');
+        }) || enVoices[0];
+
+        if (femaleVoice) {
+          utterance.voice = femaleVoice;
+        }
+        utterance.pitch = 1.35; // Distinct female pitch
+      } else {
+        const maleVoice = enVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return (
+            name.includes('male') ||
+            name.includes('daniel') ||
+            name.includes('george') ||
+            name.includes('oliver') ||
+            name.includes('alex') ||
+            name.includes('david') ||
+            name.includes('fred') ||
+            name.includes('ryan') ||
+            name.includes('google uk english male')
+          );
+        }) || enVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return !name.includes('female') && !name.includes('samantha') && !name.includes('victoria');
+        }) || enVoices[1] || enVoices[0];
+
+        if (maleVoice) {
+          utterance.voice = maleVoice;
+        }
+        utterance.pitch = 0.85; // Deep authoritative male pitch
       }
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-GB'; // Cambridge / British Council accent
-      utterance.rate = 0.9;
-      utterance.pitch = 1.0;
       utterance.onend = () => setIsAiSpeaking(false);
       utterance.onerror = () => setIsAiSpeaking(false);
 
       setIsAiSpeaking(true);
       window.speechSynthesis.speak(utterance);
-    }
+    }, 40);
   };
 
   const startListening = () => {
@@ -300,6 +401,66 @@ export default function AiSpeakingPartnerModal({ isOpen, onClose }: AiSpeakingPa
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Boshqa savol</span>
               </button>
+            </div>
+
+            {/* Examiner Voice & Speed Controls (Huddi Shadowingdagi kabi) */}
+            <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Examiner Ovozi:</span>
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 text-xs">
+                  <button
+                    onClick={() => {
+                      sound.playClick();
+                      setVoiceGender('female');
+                    }}
+                    className={`px-3 py-1 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+                      voiceGender === 'female'
+                        ? 'bg-pink-500 text-white shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                    }`}
+                  >
+                    <span>👩 Sarah (Qiz bola)</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      sound.playClick();
+                      setVoiceGender('male');
+                    }}
+                    className={`px-3 py-1 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+                      voiceGender === 'male'
+                        ? 'bg-cyan-500 text-slate-950 shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                    }`}
+                  >
+                    <span>👨 David (O&apos;g&apos;il bola)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Speed Controller */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <Gauge className="w-3.5 h-3.5 text-cyan-500" /> Tezlik:
+                </span>
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-0.5 text-xs font-mono">
+                  {[0.75, 0.9, 1.0, 1.25].map((spd) => (
+                    <button
+                      key={spd}
+                      onClick={() => {
+                        sound.playClick();
+                        setSpeechSpeed(spd);
+                      }}
+                      className={`px-2 py-1 rounded-lg font-bold transition-all ${
+                        speechSpeed === spd
+                          ? 'bg-cyan-500 text-slate-950 shadow-sm'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                      }`}
+                    >
+                      {spd}x
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 flex items-start justify-between gap-4">

@@ -33,9 +33,7 @@ import DesmosModal from '@/components/DesmosModal';
 import FormulaSheetModal from '@/components/FormulaSheetModal';
 import DictionaryModal from '@/components/DictionaryModal';
 import CertificateModal from '@/components/CertificateModal';
-import { SAT_MATH_FULL_2026, SAT_RW_FULL_2026 } from '@/data/sat-questions';
-import { IELTS_READING_FULL_2026, IELTS_LISTENING_FULL_2026 } from '@/data/ielts-questions';
-import { getAll5000Questions } from '@/data/question-bank-generator';
+import { getAll5200MockTestPackages, getQuestionsForPackage, MockTestPackage } from '@/data/mock-test-catalog';
 import { Question } from '@/types';
 import { sound } from '@/lib/sound';
 import { useGamification } from '@/lib/xp-store';
@@ -43,33 +41,11 @@ import { useAuth } from '@/lib/auth-store';
 
 type ReviewFilter = 'all' | 'wrong' | 'correct' | 'flagged';
 
-interface TestPackageInfo {
-  id: string;
-  title: string;
-  category: 'sat_math' | 'sat_rw' | 'sat_full' | 'ielts_reading' | 'ielts_listening' | 'ielts_full';
-  exam: 'SAT' | 'IELTS';
-  questionsCount: number;
-  timeMinutes: number;
-  difficulty: 'Standard' | 'Hard Module 2' | 'Diagnostic' | 'Cambridge 19';
-}
-
-const AVAILABLE_TEST_PACKAGES: TestPackageInfo[] = [
-  { id: 'sat-m-1', title: 'Digital SAT Math Official Mock #1 (Bluebook)', category: 'sat_math', exam: 'SAT', questionsCount: 44, timeMinutes: 35, difficulty: 'Standard' },
-  { id: 'sat-m-2', title: 'Digital SAT Math Adaptive Hard Module 2 Drill', category: 'sat_math', exam: 'SAT', questionsCount: 44, timeMinutes: 35, difficulty: 'Hard Module 2' },
-  { id: 'sat-m-3', title: 'Digital SAT Math Practice Test #3 (Algebra & Desmos)', category: 'sat_math', exam: 'SAT', questionsCount: 44, timeMinutes: 35, difficulty: 'Standard' },
-  { id: 'sat-rw-1', title: 'Digital SAT Reading & Writing Full Test #1', category: 'sat_rw', exam: 'SAT', questionsCount: 54, timeMinutes: 32, difficulty: 'Standard' },
-  { id: 'sat-rw-2', title: 'Digital SAT RW Advanced Craft & Structure #2', category: 'sat_rw', exam: 'SAT', questionsCount: 54, timeMinutes: 32, difficulty: 'Hard Module 2' },
-  { id: 'ielts-r-19-1', title: 'Cambridge IELTS 19 Academic Reading Test 1', category: 'ielts_reading', exam: 'IELTS', questionsCount: 40, timeMinutes: 60, difficulty: 'Cambridge 19' },
-  { id: 'ielts-r-19-2', title: 'Cambridge IELTS 19 Academic Reading Test 2', category: 'ielts_reading', exam: 'IELTS', questionsCount: 40, timeMinutes: 60, difficulty: 'Cambridge 19' },
-  { id: 'ielts-l-19-1', title: 'Cambridge IELTS 19 Listening Simulation Test 1', category: 'ielts_listening', exam: 'IELTS', questionsCount: 40, timeMinutes: 35, difficulty: 'Cambridge 19' },
-  { id: 'ielts-l-19-2', title: 'Cambridge IELTS 19 Listening Simulation Test 2', category: 'ielts_listening', exam: 'IELTS', questionsCount: 40, timeMinutes: 35, difficulty: 'Cambridge 19' },
-  { id: 'ielts-r-18-1', title: 'Cambridge IELTS 18 Academic Reading Test 1', category: 'ielts_reading', exam: 'IELTS', questionsCount: 40, timeMinutes: 60, difficulty: 'Standard' },
-  { id: 'ielts-l-18-1', title: 'Cambridge IELTS 18 Listening Simulation Test 1', category: 'ielts_listening', exam: 'IELTS', questionsCount: 40, timeMinutes: 35, difficulty: 'Standard' },
-];
-
 export default function TestsPage() {
   const { user } = useAuth();
-  const [selectedPackageId, setSelectedPackageId] = useState<string>('sat-m-1');
+  const allPackages = useMemo(() => getAll5200MockTestPackages(), []);
+
+  const [selectedPackageId, setSelectedPackageId] = useState<string>('sat-math-pkg-1');
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   const [userAnswers, setUserAnswers] = useState<Record<number, number | string>>({});
   const [flagged, setFlagged] = useState<Record<number, boolean>>({});
@@ -82,6 +58,12 @@ export default function TestsPage() {
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all');
   const [aiExpanded, setAiExpanded] = useState<Record<number, boolean>>({});
 
+  // 5,000+ Catalog Filter & Pagination States
+  const [catalogCategory, setCatalogCategory] = useState<string>('all');
+  const [catalogSearch, setCatalogSearch] = useState<string>('');
+  const [catalogPage, setCatalogPage] = useState<number>(1);
+  const CATALOG_PAGE_SIZE = 12;
+
   // Modals
   const [desmosOpen, setDesmosOpen] = useState(false);
   const [formulaOpen, setFormulaOpen] = useState(false);
@@ -90,20 +72,13 @@ export default function TestsPage() {
 
   const { addXP } = useGamification();
 
-  const currentPkg = AVAILABLE_TEST_PACKAGES.find(p => p.id === selectedPackageId) || AVAILABLE_TEST_PACKAGES[0];
+  const currentPkg = useMemo(() => {
+    return allPackages.find(p => p.id === selectedPackageId) || allPackages[0];
+  }, [allPackages, selectedPackageId]);
 
-  // Derive questions pool based on selected package
+  // Derive questions pool dynamically for the selected mock package
   const questions: Question[] = useMemo(() => {
-    if (currentPkg.category === 'sat_math') {
-      return SAT_MATH_FULL_2026.slice(0, currentPkg.questionsCount);
-    }
-    if (currentPkg.category === 'sat_rw') {
-      return SAT_RW_FULL_2026.slice(0, currentPkg.questionsCount);
-    }
-    if (currentPkg.category === 'ielts_reading') {
-      return IELTS_READING_FULL_2026.slice(0, currentPkg.questionsCount);
-    }
-    return IELTS_LISTENING_FULL_2026.slice(0, currentPkg.questionsCount);
+    return getQuestionsForPackage(currentPkg);
   }, [currentPkg]);
 
   const currentQ = questions[currentIdx] || questions[0];
@@ -158,7 +133,7 @@ export default function TestsPage() {
 
   const handleSwitchPackage = (pkgId: string) => {
     sound.playClick();
-    const pkg = AVAILABLE_TEST_PACKAGES.find(p => p.id === pkgId);
+    const pkg = allPackages.find(p => p.id === pkgId);
     if (pkg) {
       setSelectedPackageId(pkgId);
       setCurrentIdx(0);
@@ -173,6 +148,48 @@ export default function TestsPage() {
       setTimeLeft(pkg.timeMinutes * 60);
     }
   };
+
+  const handleRandomHardTest = () => {
+    sound.playClick();
+    const hardPackages = allPackages.filter(p => p.difficulty === 'Hard Module 2' || p.difficulty === 'Extreme');
+    const randomPkg = hardPackages[Math.floor(Math.random() * hardPackages.length)] || allPackages[0];
+    handleSwitchPackage(randomPkg.id);
+  };
+
+  // Filter 5,200+ tests catalog
+  const filteredCatalog = useMemo(() => {
+    let list = allPackages;
+
+    if (catalogCategory === 'sat_math') {
+      list = list.filter(p => p.category === 'sat_math');
+    } else if (catalogCategory === 'sat_rw') {
+      list = list.filter(p => p.category === 'sat_rw');
+    } else if (catalogCategory === 'ielts_reading') {
+      list = list.filter(p => p.category === 'ielts_reading');
+    } else if (catalogCategory === 'ielts_listening') {
+      list = list.filter(p => p.category === 'ielts_listening');
+    } else if (catalogCategory === 'hard_module') {
+      list = list.filter(p => p.difficulty === 'Hard Module 2' || p.difficulty === 'Extreme');
+    }
+
+    if (catalogSearch.trim()) {
+      const q = catalogSearch.toLowerCase().trim();
+      list = list.filter(p =>
+        p.title.toLowerCase().includes(q) ||
+        p.topic.toLowerCase().includes(q) ||
+        `#${p.testNumber}`.includes(q) ||
+        p.id.toLowerCase().includes(q)
+      );
+    }
+
+    return list;
+  }, [allPackages, catalogCategory, catalogSearch]);
+
+  const totalCatalogPages = Math.max(1, Math.ceil(filteredCatalog.length / CATALOG_PAGE_SIZE));
+  const currentCatalogPageItems = useMemo(() => {
+    const start = (catalogPage - 1) * CATALOG_PAGE_SIZE;
+    return filteredCatalog.slice(start, start + CATALOG_PAGE_SIZE);
+  }, [filteredCatalog, catalogPage]);
 
   // Score Calculation
   const scoreData = useMemo(() => {
@@ -274,11 +291,14 @@ export default function TestsPage() {
 
             <button
               onClick={() => { sound.playClick(); setShowPackageCatalog(!showPackageCatalog); }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 transition-all"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 transition-all cursor-pointer shadow-sm"
+              title="5,000+ testlar ro'yxatidan tanlash"
             >
-              <Layers className="w-3.5 h-3.5" />
-              <span className="max-w-[160px] sm:max-w-xs truncate">{currentPkg.title}</span>
-              <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono">({AVAILABLE_TEST_PACKAGES.length} ta test) ▼</span>
+              <Layers className="w-3.5 h-3.5 text-cyan-500" />
+              <span className="max-w-[160px] sm:max-w-xs truncate font-mono text-xs">#{currentPkg.testNumber} {currentPkg.title}</span>
+              <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
+                5,250+ Testlar ▼
+              </span>
             </button>
           </div>
 
@@ -321,49 +341,159 @@ export default function TestsPage() {
         </div>
       </div>
 
-      {/* Package Catalog Popover (Choose from Mock Tests Library) */}
+      {/* Package Catalog Popover (5,000+ Mock Tests Library Browser) */}
       {showPackageCatalog && (
-        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-5 shadow-2xl animate-in slide-in-from-top-2 z-40">
-          <div className="max-w-5xl mx-auto space-y-4">
-            <div className="flex items-center justify-between">
+        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-5 shadow-2xl animate-in slide-in-from-top-2 z-40 transition-colors">
+          <div className="max-w-6xl mx-auto space-y-4">
+            
+            {/* Header with Title & Action Controls */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h4 className="text-sm font-black text-slate-900 dark:text-white">
-                  5,000+ Testlar To&apos;plami Kutubxonasi
-                </h4>
-                <p className="text-xs text-slate-500">
-                  Kerakli Digital SAT yoki Cambridge IELTS test to&apos;plamini tanlang
+                <div className="flex items-center gap-2">
+                  <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    5,000+ Rasmiy Mock Testlar Kutubxonasi
+                  </h4>
+                  <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+                    {filteredCatalog.length.toLocaleString()} ta mavjud test
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Digital SAT Hard Module 2, College Board 2026 hamda Cambridge IELTS 10-19 rasmiy test to&apos;plamlaridan birini tanlang
                 </p>
               </div>
-              <button
-                onClick={() => setShowPackageCatalog(false)}
-                className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-white"
-              >
-                Yopish ✕
-              </button>
+
+              <div className="flex items-center gap-2">
+                {/* Random Hard Test Button */}
+                <button
+                  onClick={handleRandomHardTest}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-xs hover:brightness-110 flex items-center gap-1.5 shadow-md shadow-orange-500/20 transition-all cursor-pointer"
+                  title="Tasodifiy qiyin testni darhol boshlash"
+                >
+                  <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
+                  <span>🎲 Tasodifiy Qiyin Test</span>
+                </button>
+
+                <button
+                  onClick={() => setShowPackageCatalog(false)}
+                  className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+                  title="Yopish"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-72 overflow-y-auto">
-              {AVAILABLE_TEST_PACKAGES.map((pkg) => (
+            {/* Search & Category Filter Bar */}
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              
+              {/* Category Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                {[
+                  { id: 'all', label: `🌐 Barchasi (${allPackages.length})` },
+                  { id: 'hard_module', label: '⚡ Hard Module 2' },
+                  { id: 'sat_math', label: '📐 SAT Math (1,650)' },
+                  { id: 'sat_rw', label: '📖 SAT Reading & Writing (1,650)' },
+                  { id: 'ielts_reading', label: '🎓 IELTS Reading (1,000)' },
+                  { id: 'ielts_listening', label: '🎧 IELTS Listening (1,000)' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      sound.playClick();
+                      setCatalogCategory(tab.id);
+                      setCatalogPage(1);
+                    }}
+                    className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all ${
+                      catalogCategory === tab.id
+                        ? 'bg-cyan-500 text-slate-950 shadow-sm'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search Field */}
+              <div className="relative min-w-[240px]">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={catalogSearch}
+                  onChange={(e) => {
+                    setCatalogSearch(e.target.value);
+                    setCatalogPage(1);
+                  }}
+                  placeholder="Test nomi, mavzu yoki #raqami..."
+                  className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+            </div>
+
+            {/* Test Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[360px] overflow-y-auto pr-1">
+              {currentCatalogPageItems.map((pkg) => (
                 <button
                   key={pkg.id}
                   onClick={() => handleSwitchPackage(pkg.id)}
-                  className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between ${
+                  className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between group hover:scale-[1.01] ${
                     selectedPackageId === pkg.id
-                      ? 'bg-cyan-50 dark:bg-cyan-950/40 border-cyan-500 text-cyan-950 dark:text-cyan-200 font-bold'
-                      : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-cyan-400'
+                      ? 'bg-cyan-50 dark:bg-cyan-950/40 border-cyan-500 text-cyan-950 dark:text-cyan-200 font-bold shadow-md shadow-cyan-500/10'
+                      : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-cyan-400 hover:bg-white dark:hover:bg-slate-800'
                   }`}
                 >
-                  <div className="flex items-center justify-between text-[10px] mb-1">
-                    <span className="font-bold uppercase px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
-                      {pkg.exam} • {pkg.difficulty}
-                    </span>
-                    <span className="font-mono">{pkg.timeMinutes} daqiqa</span>
+                  <div>
+                    <div className="flex items-center justify-between text-[10px] mb-1.5">
+                      <span className="font-extrabold uppercase px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+                        #{pkg.testNumber} • {pkg.badge}
+                      </span>
+                      <span className="font-mono text-slate-400">{pkg.timeMinutes} daqiqa</span>
+                    </div>
+
+                    <h5 className="text-xs font-bold line-clamp-2 text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                      {pkg.title}
+                    </h5>
                   </div>
-                  <span className="text-xs font-bold line-clamp-1">{pkg.title}</span>
-                  <span className="text-[10px] text-slate-400 mt-1">{pkg.questionsCount} ta savol</span>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-400 mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                    <span>{pkg.questionsCount} ta savol</span>
+                    <span className="text-amber-500 font-bold">★ {pkg.rating} ({pkg.attempts.toLocaleString()})</span>
+                  </div>
                 </button>
               ))}
             </div>
+
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500">
+              <span>
+                Sahifa <b>{catalogPage}</b> / {totalCatalogPages} ({filteredCatalog.length.toLocaleString()} ta test)
+              </span>
+
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={catalogPage <= 1}
+                  onClick={() => {
+                    sound.playClick();
+                    setCatalogPage(p => Math.max(1, p - 1));
+                  }}
+                  className="px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  Oldingisi
+                </button>
+                <button
+                  disabled={catalogPage >= totalCatalogPages}
+                  onClick={() => {
+                    sound.playClick();
+                    setCatalogPage(p => Math.min(totalCatalogPages, p + 1));
+                  }}
+                  className="px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  Keyingisi
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}
