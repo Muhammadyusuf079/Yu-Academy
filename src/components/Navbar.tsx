@@ -215,13 +215,13 @@ export default function Navbar({
             <Link 
               href="/" 
               onClick={handleNavClick}
-              className="flex items-center focus:outline-none shrink-0 mr-1 sm:mr-3"
+              className="flex items-center focus:outline-none shrink-0"
             >
               <YuLogo size="md" />
             </Link>
 
-            {/* 2. Center: Perfectly Centered & Balanced Navigation Links */}
-            <nav className="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-2 mx-1 min-w-0">
+            {/* 2. Center: Clean Navigation Links (Rigid Flex Sibling - Never Overlaps) */}
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
               <Link
                 href="/"
                 onClick={handleNavClick}

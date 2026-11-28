@@ -17,13 +17,12 @@ if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
   };
 }
 
-// Female voice name identifiers in order of audio quality
+// Female voice name identifiers in priority order (macOS, Windows, Chrome, Edge, iOS, Android)
 const FEMALE_NAMES = [
   'samantha',
   'victoria',
-  'google us english',
-  'google uk english female',
   'karen',
+  'kathy',
   'moira',
   'tessa',
   'fiona',
@@ -32,6 +31,7 @@ const FEMALE_NAMES = [
   'stephanie',
   'zira',
   'jenny',
+  'aria',
   'libby',
   'sonia',
   'maisie',
@@ -39,11 +39,23 @@ const FEMALE_NAMES = [
   'allison',
   'susan',
   'veena',
+  'zoe',
+  'nicky',
+  'sangeeta',
+  'priya',
+  'hazel',
+  'heera',
+  'helena',
+  'catherine',
+  'linda',
+  'google us english',
+  'google uk english female',
   'female',
   'woman',
+  'girl',
 ];
 
-// Male voice name identifiers
+// Male and novelty voice name identifiers (strictly avoided when female is requested)
 const MALE_NAMES = [
   'daniel',
   'oliver',
@@ -51,14 +63,38 @@ const MALE_NAMES = [
   'david',
   'alex',
   'fred',
+  'albert',
+  'ralph',
+  'rishi',
+  'junior',
   'ryan',
   'brian',
   'guy',
   'tom',
-  'albert',
+  'mark',
+  'richard',
+  'james',
   'google uk english male',
+  'microsoft david',
+  'microsoft mark',
+  'microsoft george',
   'male',
   'man',
+  'boy',
+  'bad news',
+  'bahh',
+  'bells',
+  'boing',
+  'bubbles',
+  'cellos',
+  'good news',
+  'jester',
+  'organ',
+  'superstar',
+  'trinoids',
+  'whisper',
+  'zarvox',
+  'wobble',
 ];
 
 export function getCachedVoices(): SpeechSynthesisVoice[] {
@@ -68,8 +104,14 @@ export function getCachedVoices(): SpeechSynthesisVoice[] {
   return cachedVoices;
 }
 
-export function findVoiceForGender(gender: 'female' | 'male'): SpeechSynthesisVoice | null {
-  const allVoices = getCachedVoices();
+export function findVoiceForGender(
+  gender: 'female' | 'male',
+  passedVoices?: SpeechSynthesisVoice[]
+): SpeechSynthesisVoice | null {
+  const allVoices = (passedVoices && passedVoices.length > 0)
+    ? passedVoices
+    : getCachedVoices();
+
   if (!allVoices || allVoices.length === 0) return null;
 
   // Prefer English voices
@@ -83,29 +125,40 @@ export function findVoiceForGender(gender: 'female' | 'male'): SpeechSynthesisVo
       if (match) return match;
     }
 
-    // 2. Fallback: Any voice whose name does NOT match any male name
-    const nonMale = pool.find(v => {
+    // 2. Strict Filter: Any voice whose name does NOT match ANY male or novelty name
+    const strictlyNonMale = pool.filter(v => {
       const n = v.name.toLowerCase();
       return !MALE_NAMES.some(m => n.includes(m));
     });
-    if (nonMale) return nonMale;
 
+    if (strictlyNonMale.length > 0) {
+      // Look for any female hint in the name
+      const femaleLike = strictlyNonMale.find(v => {
+        const n = v.name.toLowerCase();
+        return n.includes('female') || n.includes('woman') || n.includes('girl') || n.includes('natural');
+      });
+      return femaleLike || strictlyNonMale[0];
+    }
+
+    // 3. Fallback to first voice in pool if no female available (pitch shift will handle feminization)
     return pool[0] || null;
   } else {
-    // 1. Search by known male names
+    // Male Voice Selection:
     for (const nameKeyword of MALE_NAMES) {
       const match = pool.find(v => v.name.toLowerCase().includes(nameKeyword));
       if (match) return match;
     }
 
-    // 2. Fallback: Any voice whose name does NOT match any female name
-    const nonFemale = pool.find(v => {
+    const strictlyNonFemale = pool.filter(v => {
       const n = v.name.toLowerCase();
       return !FEMALE_NAMES.some(f => n.includes(f));
     });
-    if (nonFemale) return nonFemale;
 
-    return pool[1] || pool[0] || null;
+    if (strictlyNonFemale.length > 0) {
+      return strictlyNonFemale[0];
+    }
+
+    return pool[0] || null;
   }
 }
 
@@ -126,18 +179,16 @@ export function speakTextWithGender(
     window.speechSynthesis.cancel();
   } catch {}
 
-  // Allow cancellation to settle across Safari/Chrome
-  setTimeout(() => {
+  const runSynthesis = () => {
     try {
-      // Re-query voices if cache was empty
-      if (cachedVoices.length === 0) {
-        cachedVoices = window.speechSynthesis.getVoices() || [];
-      }
+      const liveVoices = (browserVoices && browserVoices.length > 0)
+        ? browserVoices
+        : (window.speechSynthesis.getVoices() || cachedVoices);
 
       const utterance = new SpeechSynthesisUtterance(text);
-      activeUtterance = utterance; // Retain reference to prevent garbage collection
+      activeUtterance = utterance; // Prevent garbage collection during playback
 
-      const matchedVoice = findVoiceForGender(gender);
+      const matchedVoice = findVoiceForGender(gender, liveVoices);
 
       if (matchedVoice) {
         utterance.voice = matchedVoice;
@@ -146,16 +197,16 @@ export function speakTextWithGender(
         utterance.lang = gender === 'female' ? 'en-US' : 'en-GB';
       }
 
-      // Voice Pitch Calibration:
-      // Female: 1.45 (Bright, natural feminine pitch)
-      // Male: 0.80 (Deep, calm, resonant masculine pitch)
+      // Voice Pitch & Rate Calibration:
+      // Female: 1.35 pitch + 1.04 rate (Natural, bright, clearly feminine tone)
+      // Male: 0.82 pitch + 0.96 rate (Deep, calm, resonant masculine tone)
       if (gender === 'female') {
-        utterance.pitch = 1.45;
+        utterance.pitch = 1.35;
+        utterance.rate = Math.max(0.7, Math.min(1.4, (speed || 1.0) * 1.04));
       } else {
-        utterance.pitch = 0.80;
+        utterance.pitch = 0.82;
+        utterance.rate = Math.max(0.6, Math.min(1.3, (speed || 1.0) * 0.96));
       }
-
-      utterance.rate = Math.max(0.6, Math.min(1.5, speed || 1.0));
 
       utterance.onend = () => {
         activeUtterance = null;
@@ -173,7 +224,30 @@ export function speakTextWithGender(
       console.error('Speech synthesis execution error:', err);
       if (onError) onError();
     }
-  }, 45);
+  };
+
+  // If voices have not yet loaded in this browser session, wait for onvoiceschanged
+  const availableVoices = window.speechSynthesis.getVoices();
+  if (!availableVoices || availableVoices.length === 0) {
+    let triggered = false;
+    const fallbackTimer = setTimeout(() => {
+      if (!triggered) {
+        triggered = true;
+        runSynthesis();
+      }
+    }, 120);
+
+    window.speechSynthesis.onvoiceschanged = () => {
+      if (!triggered) {
+        triggered = true;
+        clearTimeout(fallbackTimer);
+        cachedVoices = window.speechSynthesis.getVoices() || [];
+        runSynthesis();
+      }
+    };
+  } else {
+    setTimeout(runSynthesis, 35);
+  }
 }
 
 export function stopSpeech(): void {

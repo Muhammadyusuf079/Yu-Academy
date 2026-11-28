@@ -51,7 +51,7 @@ export default function YuLogo({
           )}
         </div>
         {showSubtitle && (
-          <p className={`${iconDimensions.sub} font-medium text-slate-500 dark:text-slate-400 tracking-wide hidden sm:block`}>
+          <p className={`${iconDimensions.sub} font-medium text-slate-500 dark:text-slate-400 tracking-wide hidden 2xl:block`}>
             Digital SAT & IELTS Ecosystem
           </p>
         )}

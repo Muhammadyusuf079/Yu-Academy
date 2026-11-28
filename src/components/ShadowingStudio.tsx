@@ -31,6 +31,18 @@ export default function ShadowingStudio() {
   const [voiceGender, setVoiceGender] = useState<'female' | 'male'>('female');
   const [speechSpeed, setSpeechSpeed] = useState<number>(1.0);
   const [speakingWord, setSpeakingWord] = useState<string | null>(null);
+  const [browserVoices, setBrowserVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  // Load and cache browser voices
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    const loadVoices = () => {
+      const v = window.speechSynthesis.getVoices() || [];
+      if (v.length > 0) setBrowserVoices(v);
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }, []);
 
   // Speech Recognition & Pronunciation Analysis States
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -107,21 +119,26 @@ export default function ShadowingStudio() {
   // Play Full Sentence
   const playSpeech = (text: string, gender: 'female' | 'male' = voiceGender, speed: number = speechSpeed) => {
     sound.playClick();
-    if (isPlaying) {
-      stopSpeech();
-      setIsPlaying(false);
-      return;
-    }
-
+    stopSpeech();
     setIsPlaying(true);
     speakTextWithGender(
       text,
       gender,
       speed,
-      undefined,
+      browserVoices,
       () => setIsPlaying(false),
       () => setIsPlaying(false)
     );
+  };
+
+  const handleTogglePlay = () => {
+    sound.playClick();
+    if (isPlaying) {
+      stopSpeech();
+      setIsPlaying(false);
+    } else {
+      playSpeech(activePhrase.text, voiceGender, speechSpeed);
+    }
   };
 
   // Play Single Word (for pronunciation correction)
@@ -132,7 +149,7 @@ export default function ShadowingStudio() {
       word,
       voiceGender,
       0.85,
-      undefined,
+      browserVoices,
       () => setSpeakingWord(null),
       () => setSpeakingWord(null)
     );
@@ -377,7 +394,7 @@ export default function ShadowingStudio() {
             <div className="space-y-3 pt-2">
               {/* Play Audio Button */}
               <button
-                onClick={() => playSpeech(activePhrase.text, voiceGender, speechSpeed)}
+                onClick={handleTogglePlay}
                 className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm transition-all hover:scale-[1.01] active:scale-[0.98] shadow-lg cursor-pointer ${
                   voiceGender === 'female'
                     ? 'bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 text-white shadow-pink-500/25 hover:brightness-110'
