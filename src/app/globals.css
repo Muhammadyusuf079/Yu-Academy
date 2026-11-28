@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes soundWave {
+  0%, 100% {
+    transform: scaleY(0.25);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scaleY(1.35);
+    opacity: 1;
+  }
+}
+
+.animate-soundwave {
+  animation: soundWave 0.65s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
 /* ========================================================
    YU ACADEMY - Ultra-Modern EdTech SaaS Design System
    Inspired by Linear, Vercel & Stripe

@@ -221,6 +221,26 @@ export default function ShadowingStudio() {
       words: wordsAnalysis,
     });
 
+    // Save shadowing practice history to localStorage for user analytics
+    if (typeof window !== 'undefined') {
+      try {
+        const prev = JSON.parse(localStorage.getItem('yu_shadowing_history') || '[]');
+        prev.unshift({
+          id: 'sh-' + Date.now(),
+          phraseText: activePhrase.text,
+          score,
+          category: activePhrase.categoryLabel,
+          level: activePhrase.level,
+          date: new Date().toLocaleDateString('uz-UZ'),
+          timestamp: Date.now(),
+        });
+        localStorage.setItem('yu_shadowing_history', JSON.stringify(prev.slice(0, 30)));
+        try {
+          window.dispatchEvent(new CustomEvent('yu_shadowing_updated', { detail: prev }));
+        } catch {}
+      } catch {}
+    }
+
     if (score >= 70) {
       sound.playSuccess();
       addXP(120, "IELTS Shadowing a'lo talaffuz!");
@@ -369,16 +389,24 @@ export default function ShadowingStudio() {
                 </p>
               </div>
 
-              {/* Animated Waveform Visualization */}
-              <div className="flex items-center justify-center gap-1.5 py-2">
-                {[35, 75, 25, 85, 55, 95, 45, 70, 40, 90, 30, 80, 60, 35].map((h, i) => (
+              {/* Animated Waveform Visualization (Image 0) */}
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 py-4 h-16 bg-slate-50/80 dark:bg-slate-950/60 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 px-4 overflow-hidden">
+                {[14, 28, 18, 38, 22, 44, 20, 36, 18, 42, 26, 34, 20, 14].map((h, i) => (
                   <div
                     key={i}
-                    style={{ height: `${isPlaying ? (h * Math.random()).toFixed(0) : h * 0.35}px` }}
-                    className={`w-1.5 rounded-full transition-all duration-150 ${
-                      isPlaying
-                        ? voiceGender === 'female' ? 'bg-pink-500 animate-pulse' : 'bg-cyan-500 animate-pulse'
-                        : 'bg-slate-300 dark:bg-slate-700'
+                    style={{
+                      height: `${h}px`,
+                      animationDelay: `${(i % 7) * 0.09}s`,
+                      animationDuration: isRecording ? '0.45s' : '0.65s',
+                    }}
+                    className={`w-1.5 sm:w-2 rounded-full transition-all ${
+                      isPlaying || isRecording
+                        ? isRecording
+                          ? 'bg-gradient-to-t from-rose-500 via-amber-400 to-rose-300 animate-soundwave shadow-md shadow-rose-500/40'
+                          : voiceGender === 'female'
+                          ? 'bg-gradient-to-t from-pink-500 via-rose-400 to-pink-300 animate-soundwave shadow-md shadow-pink-500/40'
+                          : 'bg-gradient-to-t from-cyan-500 via-sky-400 to-blue-300 animate-soundwave shadow-md shadow-cyan-500/40'
+                        : 'bg-slate-300/80 dark:bg-slate-700'
                     }`}
                   />
                 ))}

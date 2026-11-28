@@ -126,7 +126,7 @@ export function findVoiceForGender(
       const n = v.name.toLowerCase();
       return !MALE_NAMES.some(m => n.includes(m));
     });
-    return strictlyNonMale[0] || pool[0] || null;
+    return strictlyNonMale[0] || null;
   } else {
     for (const nameKeyword of MALE_NAMES) {
       const match = pool.find(v => v.name.toLowerCase().includes(nameKeyword));
@@ -136,7 +136,7 @@ export function findVoiceForGender(
       const n = v.name.toLowerCase();
       return !FEMALE_NAMES.some(f => n.includes(f));
     });
-    return strictlyNonFemale[0] || pool[0] || null;
+    return strictlyNonFemale[0] || null;
   }
 }
 
@@ -176,11 +176,11 @@ function speakWithWebSpeech(
     }
 
     if (gender === 'female') {
-      utterance.pitch = 1.02;
-      utterance.rate = Math.max(0.7, Math.min(1.3, speed || 1.0));
+      utterance.pitch = 1.28;
+      utterance.rate = Math.max(0.75, Math.min(1.25, (speed || 1.0) * 0.96));
     } else {
-      utterance.pitch = 0.88;
-      utterance.rate = Math.max(0.6, Math.min(1.3, (speed || 1.0) * 0.95));
+      utterance.pitch = 0.82;
+      utterance.rate = Math.max(0.65, Math.min(1.2, (speed || 1.0) * 0.92));
     }
 
     utterance.onend = () => {
@@ -220,7 +220,7 @@ export function speakTextWithGender(
   if (gender === 'female') {
     try {
       const query = encodeURIComponent(text.trim());
-      const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${query}`;
+      const audioUrl = `/api/tts?text=${query}&gender=female`;
       const audio = new Audio(audioUrl);
       currentAudio = audio;
       audio.playbackRate = Math.max(0.7, Math.min(1.4, speed || 1.0));

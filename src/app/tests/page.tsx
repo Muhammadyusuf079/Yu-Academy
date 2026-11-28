@@ -129,6 +129,29 @@ export default function TestsPage() {
     try {
       confetti({ particleCount: 120, spread: 90, origin: { y: 0.55 } });
     } catch {}
+
+    // Save test result to localStorage for dynamic account analytics
+    if (typeof window !== 'undefined') {
+      try {
+        const historyItem = {
+          id: 'test-' + Date.now(),
+          testId: currentPkg.id,
+          title: currentPkg.title,
+          exam: currentPkg.exam,
+          scoreDisplay: scoreData.scoreDisplayLabel,
+          scaledScore: scoreData.scaledScore,
+          percentage: scoreData.percentage,
+          correct: scoreData.correct,
+          total: scoreData.total,
+          date: new Date().toLocaleDateString('uz-UZ'),
+          timestamp: Date.now(),
+        };
+        const prev = JSON.parse(localStorage.getItem('yu_test_history') || '[]');
+        prev.unshift(historyItem);
+        localStorage.setItem('yu_test_history', JSON.stringify(prev.slice(0, 50)));
+        window.dispatchEvent(new CustomEvent('yu_test_history_updated', { detail: prev }));
+      } catch {}
+    }
   };
 
   const handleSwitchPackage = (pkgId: string) => {
