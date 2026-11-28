@@ -385,7 +385,7 @@ export default function ShadowingStudio() {
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
-                <span>Diktori: <b>{voiceGender === 'female' ? '👩 Ayol diktori (Samantha/Victoria)' : '👨 Erkak diktori (Daniel/Alex)'}</b></span>
+                <span>Diktori: <b>{voiceGender === 'female' ? '👩 Qiz bola ovozi (Google US / Samantha)' : '👨 O\'g\'il bola ovozi (Google UK / Daniel)'}</b></span>
                 <span>Tezlik: <b className="font-mono text-cyan-600 dark:text-cyan-400">{speechSpeed}x</b></span>
               </div>
             </div>
