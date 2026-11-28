@@ -136,10 +136,10 @@ export default function DictionaryModal({ isOpen, onClose }: DictionaryModalProp
                 <BookA className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  10,000+ Akademik Lug&apos;at &amp; Barcha Darajalar
-                  <span className="text-[10px] font-extrabold uppercase bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30">
-                    A1 • A2 • B1 • B2 • C1 • C2
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white flex flex-wrap items-center gap-2">
+                  <span>10,000+ Akademik Lug&apos;at</span>
+                  <span className="text-[10px] font-extrabold uppercase bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 px-2.5 py-0.5 rounded-full border border-cyan-500/30 whitespace-nowrap shrink-0 inline-flex items-center tracking-tight select-none">
+                    A1&nbsp;•&nbsp;A2&nbsp;•&nbsp;B1&nbsp;•&nbsp;B2&nbsp;•&nbsp;C1&nbsp;•&nbsp;C2
                   </span>
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">

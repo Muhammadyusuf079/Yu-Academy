@@ -432,7 +432,7 @@ export default function QuestionsPage() {
                             <CheckCircle2 className="w-4 h-4 text-cyan-500" />
                             <span>Qadamma-qadam ilmiy yechim &amp; tahlil:</span>
                           </div>
-                          <p className="whitespace-pre-line text-slate-700 dark:text-slate-300 leading-relaxed">
+                          <p className="whitespace-pre-line text-slate-900 dark:text-slate-100 font-medium leading-relaxed">
                             {q.explanation}
                           </p>
                         </div>

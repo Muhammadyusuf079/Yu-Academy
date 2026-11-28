@@ -631,9 +631,9 @@ export default function TestsPage() {
                     {q.question}
                   </h4>
 
-                  <div className="p-4 rounded-2xl bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-200 dark:border-cyan-800/30 text-xs sm:text-sm text-slate-800 dark:text-slate-300">
-                    <span className="font-bold text-cyan-600 block mb-1">Yechim &amp; Desmos usuli:</span>
-                    <p className="leading-relaxed whitespace-pre-line">{q.explanation}</p>
+                  <div className="p-4 rounded-2xl bg-sky-50 dark:bg-cyan-950/30 border border-sky-200 dark:border-cyan-800/40 text-xs sm:text-sm text-slate-900 dark:text-slate-100 shadow-sm">
+                    <span className="font-bold text-cyan-700 dark:text-cyan-300 block mb-1">Yechim &amp; Desmos usuli:</span>
+                    <p className="leading-relaxed whitespace-pre-line font-medium">{q.explanation}</p>
                   </div>
                 </div>
               ))}

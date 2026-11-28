@@ -128,12 +128,12 @@ export default function DailyChallenge() {
 
           {/* Explanation Banner */}
           {isAnswered && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-cyan-950/40 border border-cyan-800/50 text-sm animate-in fade-in slide-in-from-top-2 duration-300">
-              <h4 className="font-bold text-cyan-300 flex items-center gap-1.5 mb-2">
-                <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+            <div className="p-4 sm:p-5 rounded-2xl bg-sky-50 dark:bg-cyan-950/40 border border-sky-200 dark:border-cyan-800/60 text-sm animate-in fade-in slide-in-from-top-2 duration-300 shadow-sm">
+              <h4 className="font-bold text-cyan-700 dark:text-cyan-300 flex items-center gap-1.5 mb-2">
+                <CheckCircle2 className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                 Qadamma-qadam ilmiy yechim:
               </h4>
-              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+              <p className="text-slate-900 dark:text-slate-100 font-medium text-xs sm:text-sm leading-relaxed">
                 {challenge.explanation}
               </p>
             </div>
