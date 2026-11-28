@@ -114,7 +114,7 @@ export default function HomePage() {
           <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-cyan-500/20 via-sky-500/10 to-blue-600/20 blur-[130px] rounded-full pointer-events-none -z-10" />
 
           {/* Logo Badge in Hero */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white dark:bg-slate-900/90 border border-cyan-500/30 text-cyan-700 dark:text-cyan-400 text-xs sm:text-sm font-bold shadow-lg shadow-cyan-500/10 mb-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white dark:bg-slate-900/90 border border-cyan-500/30 text-cyan-700 dark:text-cyan-400 text-xs sm:text-sm font-bold shadow-lg shadow-cyan-500/10 mb-8 animate-float-slow">
             <div className="w-5 h-5 rounded-full overflow-hidden p-0.5 bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center">
               <Image
                 src="/icons/icon.svg"
@@ -129,7 +129,7 @@ export default function HomePage() {
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1] max-w-5xl mb-6">
+          <h1 className="text-3xl sm:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1] max-w-5xl mb-6">
             1500+ Digital SAT va 8.5 IELTS <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 dark:from-cyan-400 dark:via-sky-300 dark:to-blue-500 bg-clip-text text-transparent">
               Professional Imtihon Ekotizimi
@@ -137,20 +137,20 @@ export default function HomePage() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed mb-10 font-normal">
+          <p className="text-sm sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed mb-10 font-normal px-2">
             College Board rasmiy Bluebook formati, o&apos;rnatilgan Desmos grafik kalkulyatori, 
-            ovozli AI Speaking Partner, IELTS o&apos;yinlar arenasi va 5,000+ test to&apos;plamlari.
+            ovozli AI Speaking Partner, IELTS o&apos;yinlar arenasi va 5,250+ test to&apos;plamlari.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mb-16">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mb-16 px-2">
             <Link
               href="/tests"
               onClick={() => sound.playClick()}
               className="w-full sm:w-auto px-7 py-4 rounded-2xl font-black text-sm sm:text-base text-slate-950 bg-gradient-to-r from-cyan-400 via-sky-300 to-cyan-300 hover:brightness-110 shadow-xl shadow-cyan-500/25 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Award className="w-5 h-5 text-slate-950" />
-              <span>5,000+ Mock Testlar</span>
+              <span>5,250+ Mock Testlar</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
 
@@ -159,7 +159,7 @@ export default function HomePage() {
                 sound.playClick();
                 setSpeakingAiOpen(true);
               }}
-              className="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold text-sm sm:text-base text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-500/30 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+              className="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold text-sm sm:text-base text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-500/30 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
             >
               <BrainCircuit className="w-5 h-5 text-cyan-500" />
               <span>AI Voice Speaking</span>
@@ -170,7 +170,7 @@ export default function HomePage() {
                 sound.playClick();
                 setIeltsGamesOpen(true);
               }}
-              className="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold text-sm sm:text-base text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-500/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+              className="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold text-sm sm:text-base text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-500/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
             >
               <Gamepad2 className="w-5 h-5 text-amber-500" />
               <span>IELTS O&apos;yinlar</span>
@@ -179,7 +179,7 @@ export default function HomePage() {
             <Link
               href="/questions"
               onClick={() => sound.playClick()}
-              className="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold text-sm sm:text-base text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+              className="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold text-sm sm:text-base text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
             >
               <BookOpen className="w-5 h-5 text-cyan-500" />
               <span>Savollar Bazasi</span>
@@ -187,21 +187,21 @@ export default function HomePage() {
           </div>
 
           {/* Key Stats Counter Grid */}
-          <div className="w-full max-w-5xl grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-6 border-t border-slate-200 dark:border-slate-800/80">
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 text-center shadow-sm">
-              <span className="text-3xl sm:text-4xl font-black text-cyan-600 dark:text-cyan-400 font-mono block">5,000+</span>
+          <div className="w-full max-w-5xl grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 pt-6 border-t border-slate-200 dark:border-slate-800/80">
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 text-center shadow-sm hover:border-cyan-500/50 hover:-translate-y-1 transition-all duration-300">
+              <span className="text-2xl sm:text-4xl font-black text-cyan-600 dark:text-cyan-400 font-mono block">5,250+</span>
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 block">Testlar &amp; Mashqlar</span>
             </div>
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 text-center shadow-sm">
-              <span className="text-3xl sm:text-4xl font-black text-sky-600 dark:text-sky-400 font-mono block">100%</span>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 text-center shadow-sm hover:border-sky-500/50 hover:-translate-y-1 transition-all duration-300">
+              <span className="text-2xl sm:text-4xl font-black text-sky-600 dark:text-sky-400 font-mono block">100%</span>
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 block">Saytda O&apos;rnatilgan Desmos</span>
             </div>
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 text-center shadow-sm">
-              <span className="text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-400 font-mono block">AI Voice</span>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 text-center shadow-sm hover:border-emerald-500/50 hover:-translate-y-1 transition-all duration-300">
+              <span className="text-2xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-400 font-mono block">AI Voice</span>
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 block">Real-vaqtda Speaking Hamroh</span>
             </div>
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 text-center shadow-sm">
-              <span className="text-3xl sm:text-4xl font-black text-amber-600 dark:text-amber-400 font-mono block">Admin &amp; Ustoz</span>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 text-center shadow-sm hover:border-amber-500/50 hover:-translate-y-1 transition-all duration-300">
+              <span className="text-2xl sm:text-4xl font-black text-amber-600 dark:text-amber-400 font-mono block">Admin &amp; Ustoz</span>
               <span className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 block">Boshqaruv Studiyasi</span>
             </div>
           </div>

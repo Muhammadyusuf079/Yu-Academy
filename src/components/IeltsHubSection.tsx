@@ -105,52 +105,52 @@ export default function IeltsHubSection() {
         </div>
 
         {/* 4 Skills Navigation Tabs */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 p-1.5 bg-white dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-4xl mx-auto mb-10">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-3 p-1.5 bg-white dark:bg-slate-950/80 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-4xl mx-auto mb-10">
           <button
             onClick={() => { sound.playClick(); setActiveTab('listening'); }}
-            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 px-2 sm:py-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'listening'
-                ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25'
+                ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25 scale-[1.02]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
             }`}
           >
-            <Headphones className="w-4 h-4" />
+            <Headphones className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Listening</span>
           </button>
 
           <button
             onClick={() => { sound.playClick(); setActiveTab('reading'); }}
-            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 px-2 sm:py-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'reading'
-                ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
+                ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25 scale-[1.02]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
             }`}
           >
-            <BookOpen className="w-4 h-4" />
+            <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Reading</span>
           </button>
 
           <button
             onClick={() => { sound.playClick(); setActiveTab('writing'); }}
-            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 px-2 sm:py-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'writing'
-                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/25'
+                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/25 scale-[1.02]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
             }`}
           >
-            <PenTool className="w-4 h-4" />
+            <PenTool className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Writing</span>
           </button>
 
           <button
             onClick={() => { sound.playClick(); setActiveTab('speaking'); }}
-            className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 px-2 sm:py-3 sm:px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'speaking'
-                ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/25'
+                ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/25 scale-[1.02]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
             }`}
           >
-            <Mic className="w-4 h-4" />
+            <Mic className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Speaking</span>
           </button>
         </div>

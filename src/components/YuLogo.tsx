@@ -17,8 +17,8 @@ export default function YuLogo({
   className = '',
 }: YuLogoProps) {
   const iconDimensions = {
-    sm: { width: 32, height: 32, box: 'w-8 h-8', text: 'text-base', sub: 'text-[10px]' },
-    md: { width: 42, height: 42, box: 'w-10 h-10 sm:w-11 sm:h-11', text: 'text-base sm:text-lg', sub: 'text-[11px]' },
+    sm: { width: 32, height: 32, box: 'w-8 h-8', text: 'text-sm', sub: 'text-[10px]' },
+    md: { width: 38, height: 38, box: 'w-9 h-9 sm:w-10 sm:h-10', text: 'text-sm sm:text-base md:text-lg', sub: 'text-[11px]' },
     lg: { width: 56, height: 56, box: 'w-14 h-14', text: 'text-2xl', sub: 'text-xs' },
   }[size];
 
