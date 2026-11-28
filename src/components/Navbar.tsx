@@ -169,45 +169,8 @@ export default function Navbar({
 
   return (
     <>
-      {/* Modals */}
-      <StreakModal
-        isOpen={streakModalOpen}
-        onClose={() => setStreakModalOpen(false)}
-        onOpenPricing={scrollToPricing}
-      />
-
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-      />
-
-      <TeacherStudioModal
-        isOpen={teacherStudioOpen}
-        onClose={() => setTeacherStudioOpen(false)}
-      />
-
-      <AiSpeakingPartnerModal
-        isOpen={speakingAiOpen}
-        onClose={() => setSpeakingAiOpen(false)}
-      />
-
-      <IeltsGameModal
-        isOpen={ieltsGamesOpen}
-        onClose={() => setIeltsGamesOpen(false)}
-      />
-
-      <AdminModal
-        isOpen={adminModalOpen}
-        onClose={() => setAdminModalOpen(false)}
-      />
-
-      <DictionaryModal
-        isOpen={dictModalInternalOpen}
-        onClose={() => setDictModalInternalOpen(false)}
-      />
-
       {/* Main Single-Row Sticky Header */}
-      <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-b border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-colors duration-200">
+      <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/95 dark:bg-slate-900/95 border-b border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-18 gap-2 flex-nowrap whitespace-nowrap">
             
@@ -560,6 +523,43 @@ export default function Navbar({
           </div>
         )}
       </header>
+
+      {/* Modals - Always float cleanly above header (z-[100]) */}
+      <StreakModal
+        isOpen={streakModalOpen}
+        onClose={() => setStreakModalOpen(false)}
+        onOpenPricing={scrollToPricing}
+      />
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
+
+      <TeacherStudioModal
+        isOpen={teacherStudioOpen}
+        onClose={() => setTeacherStudioOpen(false)}
+      />
+
+      <AiSpeakingPartnerModal
+        isOpen={speakingAiOpen}
+        onClose={() => setSpeakingAiOpen(false)}
+      />
+
+      <IeltsGameModal
+        isOpen={ieltsGamesOpen}
+        onClose={() => setIeltsGamesOpen(false)}
+      />
+
+      <AdminModal
+        isOpen={adminModalOpen}
+        onClose={() => setAdminModalOpen(false)}
+      />
+
+      <DictionaryModal
+        isOpen={dictModalInternalOpen}
+        onClose={() => setDictModalInternalOpen(false)}
+      />
     </>
   );
 }
